@@ -177,6 +177,33 @@ public class ApiNeoBot {
 
     }
 
+    public static TelegramResponseSend inlineKeyboard(String token, long chat_id_to_send, String text_to_send) throws JSONException {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseSend telegram = null;
+//        JSONObject layoutedButtons = getButtons(buttons);
+        JSONObject matriz = montaMatriz(buttons);
+        if (validationToken(token)) {
+            ZHttpPost connection = connectApi(token, "sendMessage");
+            connection.putParameter("chat_id", chat_id_to_send + "");
+            connection.putParameter("text", text_to_send);
+            connection.putParameter("reply_markup", matriz.toString());
+            try {
+                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                return telegram;
+            } catch (JSONException error) {
+                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+                Date x = new Date();
+                System.out.println(dt.format(x));
+                System.out.println("Erro ao enviar");
+                System.out.println(error);
+                return telegram;
+            }
+        } else {
+            System.out.println("WTF is that token?");
+            return telegram = null;
+        }
+    }
+
     public static TelegramResponseSend hideButton(String token, long chat_id_to_send, String text_to_send) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;

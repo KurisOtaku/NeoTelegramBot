@@ -245,7 +245,7 @@ public class ApiNeoBot {
         }
     }
 
-    public static TelegramResponseSend hideButton(String token, long chat_id_to_send, String text_to_send) throws JSONException {
+    public static TelegramResponseSend hideButtonWithMessage(String token, long chat_id_to_send, String text_to_send) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
         JSONObject objeto = new JSONObject();
@@ -254,6 +254,36 @@ public class ApiNeoBot {
             ZHttpPost connection = connectApi(token, "sendMessage");
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
+            connection.putParameter("reply_markup", objeto.toString());
+            try {
+                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+            } catch (JSONException error) {
+                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+                Date x = new Date();
+                System.out.println(dt.format(x));
+                System.out.println("Erro ao enviar");
+                System.out.println(error);
+
+            }
+        } else {
+            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+            Date x = new Date();
+            System.out.println(dt.format(x));
+            System.out.println("WTF is that token?");
+            telegram = null;
+        }
+        return telegram;
+    }
+
+    public static TelegramResponseSend hideButtonWithoutMessage(String token, long chat_id_to_send) throws JSONException {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseSend telegram = null;
+        JSONObject objeto = new JSONObject();
+        objeto.put("hide_keyboard", true);
+        if (validationToken(token)) {
+            ZHttpPost connection = connectApi(token, "sendMessage");
+            connection.putParameter("chat_id", chat_id_to_send + "");
+            connection.putParameter("text", "-");
             connection.putParameter("reply_markup", objeto.toString());
             try {
                 telegram = new TelegramResponseSend(postTelegramMessage(connection));

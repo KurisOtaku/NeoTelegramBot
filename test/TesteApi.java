@@ -23,7 +23,7 @@ public class TesteApi {
         long id_master = 52022517;
         String[] botoes = String.valueOf(id_master).split("");
 //        TelegramResponseSend send = ApiNeoBot.sendButton(token, id_master, token, botoes);
-        TelegramResponseSend send = ApiNeoBot.hideButton(token, id_master, token);
+//        TelegramResponseSend send = ApiNeoBot.hideButton(token, id_master, token);
         System.out.println("");
     }
 

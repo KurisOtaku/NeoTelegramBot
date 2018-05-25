@@ -14,7 +14,6 @@ package api.kuris.telegrambot.neo;
 import static api.kuris.telegrambot.neo.TelegramBotConnection.connectApi;
 import static api.kuris.telegrambot.neo.TelegramBotConnection.getTelegramjson;
 import static api.kuris.telegrambot.neo.TelegramBotConnection.postTelegramMessage;
-import static bot.brains.alice.connectAlice.toAi;
 import br.zul.zwork2.http.ZHttpPost;
 import br.zul.zwork2.log.ZLogFileWriter;
 import java.io.ByteArrayInputStream;
@@ -24,8 +23,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import static neotelegrambot.Translater.botSay;
-import static neotelegrambot.Translater.userSay;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,31 +32,6 @@ import org.json.JSONObject;
  * @author STI
  */
 public class ApiNeoBot {
-
-    public static void main1(String[] args) throws JSONException, UnsupportedEncodingException, IOException {
-        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
-        int id_master = 52022517;
-        TelegramResponseSend send = send(token, id_master, "oi");
-        System.out.println(send.error_description);
-    }
-
-    public static void main2(String[] args) throws JSONException, UnsupportedEncodingException, IOException {
-        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
-        int id_master = 52022517;
-
-        while (true) {
-            try {
-                TelegramUpdate x = getInstance(token);
-                String text = userSay(x.message.text).split("&")[0];
-                String resposta = toAi(text);
-                ApiNeoBot.sendReply(token, id_master, botSay(resposta), x.message.message_id);
-                System.out.println(x.message.text + " --> " + text);
-            } catch (Exception ex) {
-
-            }
-
-        }
-    }
 
     public static TelegramResponseSticker sendSticker(String token, long chat_id, String sticker) {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
@@ -156,28 +128,6 @@ public class ApiNeoBot {
 
     }
 
-    public static void main(String[] args) {
-        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
-        int id_master = 52022517;
-        int var = 1;
-        String[] botoes = ("a" + var + ";a" + var).split(";");
-        String[] urls = "google.com;google.com".split(";");
-        sendButtonFly_callback(token, id_master, "Teste2", botoes, urls);
-        TelegramUpdate update = getInstanceNoOffset(token);
-        System.out.println(update);
-    }
-
-    public static void main3(String[] args) {
-        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
-        int id_master = 52022517;
-        int var = 1;
-        String[] botoes = ("a" + var + ";a" + var).split(";");
-        String[] urls = "google.com;google.com".split(";");
-        sendButtonFly_url(token, id_master, "Teste1", botoes, urls);
-        var++;
-        botoes = ("a" + var + ";a" + var).split(";");
-        sendButtonFly_callback(token, id_master, "Teste2", botoes, urls);
-    }
 
     public static TelegramResponseSend sendButtonFly_url(String token, long chat_id_to_send, String text_to_send,
             String[] button_texts, String[] urls) throws JSONException {

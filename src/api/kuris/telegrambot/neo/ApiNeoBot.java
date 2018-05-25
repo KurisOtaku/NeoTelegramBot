@@ -61,13 +61,6 @@ public class ApiNeoBot {
         }
     }
 
-    public static void main(String[] args) {
-        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
-        int id_master = 52022517;
-        String[] botoes = "a1;a2;b1;b2".split(";");
-        sendButtonFly(token, id_master, "Teste1", botoes);
-    }
-
     public static TelegramResponseSticker sendSticker(String token, long chat_id, String sticker) {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSticker telegram = null;
@@ -139,7 +132,7 @@ public class ApiNeoBot {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
 //        JSONObject layoutedButtons = getButtons(buttons);
-        JSONObject matriz = montaMatrizTeclado(buttons);
+        JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTeclado(buttons);
         if (validationToken(token)) {
             ZHttpPost connection = connectApi(token, "sendMessage");
             connection.putParameter("chat_id", chat_id_to_send + "");
@@ -163,74 +156,82 @@ public class ApiNeoBot {
 
     }
 
-    public static JSONObject montaMatrizTeclado(String[] dados) throws JSONException {
-        JSONObject finalJson = new JSONObject();
-        int numeroColunas = (int) Math.floor(Math.sqrt(dados.length));
-        JSONArray result = new JSONArray();
-        JSONArray botoes = null;
-
-        for (int i = 0; i < dados.length; i++) {
-            int posicaoColuna = i % numeroColunas;
-            if (posicaoColuna == 0) {
-                botoes = new JSONArray();
-                result.put(botoes);
-            }
-            botoes.put(dados[i]);
-        }
-
-        finalJson.put("keyboard", result);
-        finalJson.put("one_time_keyboard", true);
-        finalJson.put("resize_keyboard", true);
-        return finalJson;
+    public static void main(String[] args) {
+        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
+        int id_master = 52022517;
+        int var = 1;
+        String[] botoes = ("a" + var + ";a" + var).split(";");
+        String[] urls = "google.com;google.com".split(";");
+        sendButtonFly_url(token, id_master, "Teste1", botoes, urls);
+        var++;
+        botoes = ("a" + var + ";a" + var).split(";");
+        sendButtonFly_callback(token, id_master, "Teste2", botoes, urls);
     }
 
-    public static TelegramResponseSend sendButtonFly(String token, long chat_id_to_send, String text_to_send, String[] buttons) throws JSONException {
-        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
-        TelegramResponseSend telegram = null;
+    public static TelegramResponseSend sendButtonFly_url(String token, long chat_id_to_send, String text_to_send,
+            String[] button_texts, String[] urls) throws JSONException {
+        if (button_texts.length != urls.length) {
+            System.out.println("qt button texts <> qt urls");
+            return null;
+        } else {
+            ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+            TelegramResponseSend telegram = null;
 //        JSONObject layoutedButtons = getButtons(buttons);
-        JSONObject matriz = montaMatrizTecladoVoador(buttons);
-        if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "sendMessage");
-            connection.putParameter("chat_id", chat_id_to_send + "");
-            connection.putParameter("text", text_to_send);
-            connection.putParameter("reply_markup", matriz.toString());
-            try {
-                telegram = new TelegramResponseSend(postTelegramMessage(connection));
-                return telegram;
-            } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
-                return telegram;
+            JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_url(button_texts, urls);
+            if (validationToken(token)) {
+                ZHttpPost connection = connectApi(token, "sendMessage");
+                connection.putParameter("chat_id", chat_id_to_send + "");
+                connection.putParameter("text", text_to_send);
+                connection.putParameter("reply_markup", matriz.toString());
+                try {
+                    telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                    return telegram;
+                } catch (JSONException error) {
+                    SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+                    Date x = new Date();
+                    System.out.println(dt.format(x));
+                    System.out.println("Erro ao enviar");
+                    System.out.println(error);
+                    return telegram;
+                }
+            } else {
+                System.out.println("WTF is that token?");
+                return telegram = null;
             }
-        } else {
-            System.out.println("WTF is that token?");
-            return telegram = null;
         }
-
     }
 
-    public static JSONObject montaMatrizTecladoVoador(String[] dados) throws JSONException {
-        JSONObject finalJson = new JSONObject();
-        int numeroColunas = (int) Math.floor(Math.sqrt(dados.length));
-
-        JSONObject result = new JSONObject();
-        
-//        JSONArray result = new JSONArray();
-//        JSONArray botoes = null;
-//
-//        for (int i = 0; i < dados.length; i++) {
-//            int posicaoColuna = i % numeroColunas;
-//            if (posicaoColuna == 0) {
-//                botoes = new JSONArray();
-//                result.put(botoes);
-//            }
-//            botoes.put(dados[i]);
-//        }
-        finalJson.put("inline_keyboard", dados);
-        return finalJson;
+    public static TelegramResponseSend sendButtonFly_callback(String token, long chat_id_to_send, String text_to_send,
+            String[] button_texts, String[] callbacks) throws JSONException {
+        if (button_texts.length != callbacks.length) {
+            System.out.println("qt button texts <> qt callbacks");
+            return null;
+        } else {
+            ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+            TelegramResponseSend telegram = null;
+//        JSONObject layoutedButtons = getButtons(buttons);
+            JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback(button_texts, callbacks);
+            if (validationToken(token)) {
+                ZHttpPost connection = connectApi(token, "sendMessage");
+                connection.putParameter("chat_id", chat_id_to_send + "");
+                connection.putParameter("text", text_to_send);
+                connection.putParameter("reply_markup", matriz.toString());
+                try {
+                    telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                    return telegram;
+                } catch (JSONException error) {
+                    SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+                    Date x = new Date();
+                    System.out.println(dt.format(x));
+                    System.out.println("Erro ao enviar");
+                    System.out.println(error);
+                    return telegram;
+                }
+            } else {
+                System.out.println("WTF is that token?");
+                return telegram = null;
+            }
+        }
     }
 
     public static TelegramResponseSend hideButton(String token, long chat_id_to_send, String text_to_send) throws JSONException {

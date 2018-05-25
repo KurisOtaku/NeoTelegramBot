@@ -162,6 +162,17 @@ public class ApiNeoBot {
         int var = 1;
         String[] botoes = ("a" + var + ";a" + var).split(";");
         String[] urls = "google.com;google.com".split(";");
+        sendButtonFly_callback(token, id_master, "Teste2", botoes, urls);
+        TelegramUpdate update = getInstanceNoOffset(token);
+        System.out.println(update);
+    }
+
+    public static void main3(String[] args) {
+        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
+        int id_master = 52022517;
+        int var = 1;
+        String[] botoes = ("a" + var + ";a" + var).split(";");
+        String[] urls = "google.com;google.com".split(";");
         sendButtonFly_url(token, id_master, "Teste1", botoes, urls);
         var++;
         botoes = ("a" + var + ";a" + var).split(";");
@@ -315,7 +326,7 @@ public class ApiNeoBot {
         }
     }
 
-    public static TelegramUpdate ApiNeoBotNoOffset(String token) throws JSONException {
+    public static TelegramUpdate getInstanceNoOffset(String token) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramUpdate t_update = null;
         if (validationToken(token)) {

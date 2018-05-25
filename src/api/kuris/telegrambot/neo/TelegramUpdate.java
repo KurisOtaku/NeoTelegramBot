@@ -23,6 +23,7 @@ public class TelegramUpdate {
     public TelegramUpdateMessage message;
     public TelegramUpdateEdited_message edited_message;
     public TelegramUpdateInline_query inline_query;
+    public TelegramUpdateCallback_query callback_query;
 
     public int getUpdate_id() {
         return update_id;
@@ -50,7 +51,11 @@ public class TelegramUpdate {
     }
 
     public String text() {
-        return message.text;
+        if (message.text != null) {
+            return message.text;
+        } else {
+            return callback_query.data;
+        }
     }
 
     public int messageId() {
@@ -98,6 +103,11 @@ public class TelegramUpdate {
             } catch (Exception tr6) {
                 this.message = null;
                 this.edited_message = null;
+            }
+            try {
+                this.callback_query = new TelegramUpdateCallback_query(updates.getJSONObject("callback_query"));
+            } catch (Exception tr9) {
+                this.callback_query = null;
             }
             try {
                 this.inline_query = new TelegramUpdateInline_query(updates);

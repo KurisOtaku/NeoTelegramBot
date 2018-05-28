@@ -6,8 +6,6 @@
     Mais informações sobre a API do Telegram:
     https://core.telegram.org/bots/api
 
-
-
  */
 package api.kuris.telegrambot.neo;
 

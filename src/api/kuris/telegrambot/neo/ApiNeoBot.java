@@ -16,12 +16,9 @@ import br.zul.zwork2.http.ZHttpPost;
 import br.zul.zwork2.log.ZLogFileWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -169,7 +166,7 @@ public class ApiNeoBot {
             ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
             TelegramResponseSend telegram = null;
 //        JSONObject layoutedButtons = getButtons(buttons);
-            JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback(button_texts, callbacks);
+            JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_multilines(button_texts, callbacks);
             if (validationToken(token)) {
                 ZHttpPost connection = connectApi(token, "sendMessage");
                 connection.putParameter("chat_id", chat_id_to_send + "");

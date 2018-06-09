@@ -21,29 +21,40 @@ public class TelegramButtonsMatrizToSend {
         JSONObject obj;
         JSONArray inlineKeyboardButtons = new JSONArray();
         JSONArray inlineKeyboardButton = new JSONArray();
+        JSONArray array = null;
         for (int i = 0; i < texts.length; i++) {
+            array = new JSONArray();
             obj = new JSONObject();
             obj.put("text", texts[i]);
             obj.put("url", urls[i]);
-            inlineKeyboardButton.put(obj);
+            array.put(obj);
+            inlineKeyboardButton.put(array);
         }
         inlineKeyboardButtons.put(inlineKeyboardButton);
         finalJson.put("inline_keyboard", inlineKeyboardButtons);
         return finalJson;
     }
 
-    public static JSONObject montaMatrizTecladoVoador_callback(String[] texts, String[] callbacks) throws JSONException {
+    public static void main(String[] args) {
+        String[] split = "A1;A2;B1;B2".split(";");
+        JSONObject toString = montaMatrizTecladoVoador_callback_multilines(split, split);
+        System.out.println(toString);
+    }
+
+    public static JSONObject montaMatrizTecladoVoador_callback_multilines(String[] texts, String[] callbacks) throws JSONException {
         JSONObject finalJson = new JSONObject();
         JSONObject obj;
         JSONArray inlineKeyboardButtons = new JSONArray();
         JSONArray inlineKeyboardButton = new JSONArray();
+        JSONArray linhas = new JSONArray();
         for (int i = 0; i < texts.length; i++) {
             obj = new JSONObject();
             obj.put("text", texts[i]);
             obj.put("callback_data", callbacks[i]);
+            inlineKeyboardButton = new JSONArray();
             inlineKeyboardButton.put(obj);
+            inlineKeyboardButtons.put(inlineKeyboardButton);
         }
-        inlineKeyboardButtons.put(inlineKeyboardButton);
         finalJson.put("inline_keyboard", inlineKeyboardButtons);
         return finalJson;
     }

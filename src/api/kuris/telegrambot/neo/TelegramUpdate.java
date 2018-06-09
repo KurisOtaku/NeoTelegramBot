@@ -51,10 +51,10 @@ public class TelegramUpdate {
     }
 
     public String text() {
-        if (message.text != null) {
-            return message.text;
-        } else {
+        if (message == null){
             return callback_query.data;
+        } else {
+            return message.text;
         }
     }
 

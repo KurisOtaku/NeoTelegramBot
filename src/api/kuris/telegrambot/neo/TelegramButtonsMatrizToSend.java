@@ -35,11 +35,6 @@ public class TelegramButtonsMatrizToSend {
         return finalJson;
     }
 
-    public static void main(String[] args) {
-        String[] split = "A1;A2;B1;B2".split(";");
-        JSONObject toString = montaMatrizTecladoVoador_callback_multilines(split, split);
-        System.out.println(toString);
-    }
 
     public static JSONObject montaMatrizTecladoVoador_callback_multilines(String[] texts, String[] callbacks) throws JSONException {
         JSONObject finalJson = new JSONObject();

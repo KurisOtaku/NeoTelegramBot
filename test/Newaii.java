@@ -29,14 +29,16 @@ public class Newaii {
         long masterid = 52022517l;
         ApiNeoBot.sendButtonFly_callback(token, masterid, "A. Botoes", split, split);
 
-//        while (true) {
-//            x = null;
-//            try {
-//                x = ApiNeoBot.getInstance(token);
-//            } catch (Exception try1) {
-//                //sem mensagem
-//            }
-//        }
+        while (true) {
+            x = null;
+            try {
+                ApiNeoBot.send(token, x.chatID(),  ApiNeoBot.getInstance(token).callback_query.data);
+                
+            } catch (Exception try1) {
+                System.out.println("");
+                //sem mensagem
+            }
+        }
     }
 
 }

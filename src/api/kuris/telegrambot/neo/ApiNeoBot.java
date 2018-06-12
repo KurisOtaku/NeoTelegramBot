@@ -123,7 +123,6 @@ public class ApiNeoBot {
 
     }
 
-
     public static TelegramResponseSend sendButtonFly_url(String token, long chat_id_to_send, String text_to_send,
             String[] button_texts, String[] urls) throws JSONException {
         if (button_texts.length != urls.length) {
@@ -370,6 +369,35 @@ public class ApiNeoBot {
             ZHttpPost connection = connectApi(token, "sendDocument");
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("document", gif_id);
+            try {
+                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                return telegram;
+            } catch (JSONException error) {
+                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+                Date x = new Date();
+                System.out.println(dt.format(x));
+                System.out.println("Erro ao enviar");
+                System.out.println(error);
+                return telegram;
+            }
+        } else {
+            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+            Date x = new Date();
+            System.out.println(dt.format(x));
+            System.out.println("WTF is that token?");
+            return telegram = null;
+        }
+    }
+
+    public static TelegramResponseSend sendAnswerCallbackQuery(String token, 
+            String callback_query_id, String text, boolean show_alert) {
+        boolean retorno = false;
+        TelegramResponseSend telegram = null;
+        if (validationToken(token)) {
+            ZHttpPost connection = connectApi(token, "answerCallbackQuery");
+            connection.putParameter("callback_query_id", callback_query_id + "");
+            connection.putParameter("text", text);
+            connection.putParameter("show_alert", show_alert+"");
             try {
                 telegram = new TelegramResponseSend(postTelegramMessage(connection));
                 return telegram;

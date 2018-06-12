@@ -32,8 +32,18 @@ public class Newaii {
         while (true) {
             x = null;
             try {
-                ApiNeoBot.send(token, x.chatID(),  ApiNeoBot.getInstance(token).callback_query.data);
-                
+                x = ApiNeoBot.getInstance(token);
+                if (x.callback_query.id_callback_query != null) {
+                    ApiNeoBot.sendAnswerCallbackQuery(token,
+                            x.callback_query.id_callback_query,
+                            x.callback_query.data, true);
+                    ApiNeoBot.deleteMessage(token,
+                            x.callback_query.messageOfBot.chat.id_chat,
+                            x.callback_query.messageOfBot.message_id);
+                    ApiNeoBot.send(token,
+                            x.callback_query.from.id_user,
+                             x.callback_query.data);
+                }
             } catch (Exception try1) {
                 System.out.println("");
                 //sem mensagem

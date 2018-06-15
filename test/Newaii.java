@@ -1,6 +1,5 @@
 
 import api.kuris.telegrambot.neo.ApiNeoBot;
-import api.kuris.telegrambot.neo.TelegramResponseSend;
 import api.kuris.telegrambot.neo.TelegramUpdate;
 import br.zul.zwork2.log.ZLogFileWriter;
 import br.zul.zwork2.log.ZVoidLogFileWriter;

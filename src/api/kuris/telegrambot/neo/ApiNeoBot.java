@@ -101,17 +101,9 @@ public class ApiNeoBot {
         String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
         ZLogFileWriter.setDefaultLogFileWriter(new ZVoidLogFileWriter());
         TelegramUpdate x = getInstanceNoOffset(token);
-        String local = "C:\\Users\\cristiano.rosa\\Desktop\\"+x.message.document.file_name;
-        System.out.println(downloadFile(token, local, x.message.document.file_id));
+        String local = "C:\\";
+        System.out.println(downloadFile(x, local));
         System.out.println("");
-    }
-
-    public static void main1(String[] args) {
-        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
-        ZLogFileWriter.setDefaultLogFileWriter(new ZVoidLogFileWriter());
-        String id_file = "BQADAQADXgADCvVRRSYlPBlmTofCAg";
-        String local = "C:\\Users\\cristiano.rosa\\Desktop\\teste.jar";
-        System.out.println(downloadFile(token, local, id_file));
     }
 
     public static String getPathFile(String token, String file_id) {
@@ -137,26 +129,60 @@ public class ApiNeoBot {
         }
     }
 
-    public static boolean downloadFile(String token, String local_download, String id_file) {
-        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
-        if (validationToken(token)) {
-            String pathFile = getPathFile(token, id_file);
-            String url = TelegramBotConnection.urlApiFiles(token, pathFile);
-            try {
-                new ZHttp().requestGet(url).send().saveAs(new File(local_download));
-                return true;
-            } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao baixar arquivo:\n{");
-                System.out.println(error);
-                System.out.println("\n}");
+    public static boolean downloadFile(TelegramUpdate instance, String local_download) {
+        if (!local_download.split("")[local_download.length()-1].equals("\\")) {
+            System.out.println("Caminho \"" + local_download + "\" não é pasta");
+            return false;
+        } else {
+            ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+            if (validationToken(instance.token)) {
+                local_download = local_download + instance.message.document.file_name;
+                String pathFile = getPathFile(instance.token, instance.message.document.file_id);
+                String url = TelegramBotConnection.urlApiFiles(instance.token, pathFile);
+                try {
+                    new ZHttp().requestGet(url).send().saveAs(new File(local_download));
+                    return true;
+                } catch (JSONException error) {
+                    SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+                    Date x = new Date();
+                    System.out.println(dt.format(x));
+                    System.out.println("Erro ao baixar arquivo:\n{");
+                    System.out.println(error);
+                    System.out.println("\n}");
+                    return false;
+                }
+            } else {
+                System.out.println("WTF is that token?");
                 return false;
             }
-        } else {
-            System.out.println("WTF is that token?");
+        }
+    }
+
+    public static boolean downloadFile(String token, String local_download, String id_file) {
+        if (!local_download.split("")[local_download.length()].equals("\\")) {
+            System.out.println("Caminho \"" + local_download + "\" não é pasta");
             return false;
+        } else {
+            ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+            if (validationToken(token)) {
+                String pathFile = getPathFile(token, id_file);
+                String url = TelegramBotConnection.urlApiFiles(token, pathFile);
+                try {
+                    new ZHttp().requestGet(url).send().saveAs(new File(local_download));
+                    return true;
+                } catch (JSONException error) {
+                    SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+                    Date x = new Date();
+                    System.out.println(dt.format(x));
+                    System.out.println("Erro ao baixar arquivo:\n{");
+                    System.out.println(error);
+                    System.out.println("\n}");
+                    return false;
+                }
+            } else {
+                System.out.println("WTF is that token?");
+                return false;
+            }
         }
     }
 
@@ -372,6 +398,7 @@ public class ApiNeoBot {
             try {
                 String conteudojson = getTelegramjson(token);
                 t_update = new TelegramUpdate(conteudojson);
+                t_update.token = token;
                 return t_update;
             } catch (Exception trynot) {
                 SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");

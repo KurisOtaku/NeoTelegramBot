@@ -12,8 +12,10 @@ package api.kuris.telegrambot.neo;
 import static api.kuris.telegrambot.neo.TelegramBotConnection.connectApi;
 import static api.kuris.telegrambot.neo.TelegramBotConnection.getTelegramjson;
 import static api.kuris.telegrambot.neo.TelegramBotConnection.postTelegramMessage;
+import br.zul.zwork2.http.ZHttp;
 import br.zul.zwork2.http.ZHttpPost;
 import br.zul.zwork2.log.ZLogFileWriter;
+import br.zul.zwork2.log.ZVoidLogFileWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.math.BigInteger;
@@ -93,6 +95,69 @@ public class ApiNeoBot {
             return telegram = null;
         }
 
+    }
+
+    public static void main(String[] args) {
+        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
+        ZLogFileWriter.setDefaultLogFileWriter(new ZVoidLogFileWriter());
+        TelegramUpdate x = getInstanceNoOffset(token);
+        String local = "C:\\Users\\cristiano.rosa\\Desktop\\"+x.message.document.file_name;
+        System.out.println(downloadFile(token, local, x.message.document.file_id));
+        System.out.println("");
+    }
+
+    public static void main1(String[] args) {
+        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
+        ZLogFileWriter.setDefaultLogFileWriter(new ZVoidLogFileWriter());
+        String id_file = "BQADAQADXgADCvVRRSYlPBlmTofCAg";
+        String local = "C:\\Users\\cristiano.rosa\\Desktop\\teste.jar";
+        System.out.println(downloadFile(token, local, id_file));
+    }
+
+    public static String getPathFile(String token, String file_id) {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseGetFile telegram = null;
+        if (validationToken(token)) {
+            ZHttpPost connection = connectApi(token, "getFile");
+            connection.putParameter("file_id", file_id + "");
+            try {
+                telegram = new TelegramResponseGetFile(postTelegramMessage(connection));
+                return telegram.file_path;
+            } catch (JSONException error) {
+                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+                Date x = new Date();
+                System.out.println(dt.format(x));
+                System.out.println("Erro ao buscar informações");
+                System.out.println(error);
+                return null;
+            }
+        } else {
+            System.out.println("WTF is that token?");
+            return null;
+        }
+    }
+
+    public static boolean downloadFile(String token, String local_download, String id_file) {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        if (validationToken(token)) {
+            String pathFile = getPathFile(token, id_file);
+            String url = TelegramBotConnection.urlApiFiles(token, pathFile);
+            try {
+                new ZHttp().requestGet(url).send().saveAs(new File(local_download));
+                return true;
+            } catch (JSONException error) {
+                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+                Date x = new Date();
+                System.out.println(dt.format(x));
+                System.out.println("Erro ao baixar arquivo:\n{");
+                System.out.println(error);
+                System.out.println("\n}");
+                return false;
+            }
+        } else {
+            System.out.println("WTF is that token?");
+            return false;
+        }
     }
 
     public static TelegramResponseSend sendButton(String token, long chat_id_to_send, String text_to_send, String[] buttons) throws JSONException {
@@ -389,7 +454,7 @@ public class ApiNeoBot {
         }
     }
 
-    public static TelegramResponseSend sendAnswerCallbackQuery(String token, 
+    public static TelegramResponseSend sendAnswerCallbackQuery(String token,
             String callback_query_id, String text, boolean show_alert) {
         boolean retorno = false;
         TelegramResponseSend telegram = null;
@@ -397,7 +462,7 @@ public class ApiNeoBot {
             ZHttpPost connection = connectApi(token, "answerCallbackQuery");
             connection.putParameter("callback_query_id", callback_query_id + "");
             connection.putParameter("text", text);
-            connection.putParameter("show_alert", show_alert+"");
+            connection.putParameter("show_alert", show_alert + "");
             try {
                 telegram = new TelegramResponseSend(postTelegramMessage(connection));
                 return telegram;

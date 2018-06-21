@@ -63,6 +63,22 @@ public class TelegramBotConnection {
         return respostaservidor;
     }
 
+    public static ZHttpPost connectApiFiles(String token, String id_file) {
+        ZHttpPost x = new ZHttp()
+                .requestPost("https://api.telegram.org/file/bot"
+                        + token
+                        + "/"
+                        + id_file);
+        return x;
+    }
+    public static String urlApiFiles(String token, String id_file) {
+        String x = "https://api.telegram.org/file/bot"
+                        + token
+                        + "/"
+                        + id_file;
+        return x;
+    }
+
     public static ZHttpPost connectApi(String token, String command) {
         ZHttpPost x = new ZHttp()
                 .requestPost("https://api.telegram.org/bot"

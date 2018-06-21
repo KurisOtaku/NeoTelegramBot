@@ -17,7 +17,7 @@ public class Newaii {
 
     public static String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         ZLogFileWriter.setDefaultLogFileWriter(new ZVoidLogFileWriter());
         ZLogFileWriter.getDefaultLogFileWriter().setInfoLogFile(null);
         ZLogFileWriter.getDefaultLogFileWriter().setWarningLogFile(null);

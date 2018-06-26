@@ -9,13 +9,9 @@
  */
 package api.kuris.telegrambot.neo;
 
-import static api.kuris.telegrambot.neo.TelegramBotConnection.connectApi;
-import static api.kuris.telegrambot.neo.TelegramBotConnection.getTelegramjson;
-import static api.kuris.telegrambot.neo.TelegramBotConnection.postTelegramMessage;
 import br.zul.zwork2.http.ZHttp;
 import br.zul.zwork2.http.ZHttpPost;
 import br.zul.zwork2.log.ZLogFileWriter;
-import br.zul.zwork2.log.ZVoidLogFileWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.math.BigInteger;
@@ -29,34 +25,37 @@ import org.json.JSONObject;
  * @author STI
  */
 public class ApiNeoBot {
-
+    
+    public static void main(String[] args) {
+        LoggerApiNeoBot obj = new LoggerApiNeoBot();
+//        obj.info("mkyong");
+        System.out.println("");
+    }
+    
+    final static LoggerApiNeoBot logger = new LoggerApiNeoBot();
+    
     public static TelegramResponseSticker sendSticker(String token, long chat_id, String sticker) {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSticker telegram = null;
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "sendSticker");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendSticker");
             connection.putParameter("chat_id", chat_id + "");
             connection.putParameter("sticker", sticker);
             try {
-                telegram = new TelegramResponseSticker(postTelegramMessage(connection));
+                telegram = new TelegramResponseSticker(TelegramBotConnection.postTelegramMessage(connection));
                 return telegram;
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
+                logger.errorToSend(error);
                 return telegram;
             }
+
+            // LOG4J  - para logs
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             return telegram = null;
         }
     }
-
+    
     public static String getUserInformations(TelegramUpdate x) {
         String resposta = "";
         resposta += "ID de Usuário: " + x.message.from.id_user + "\n";
@@ -71,66 +70,49 @@ public class ApiNeoBot {
         }
         return resposta;
     }
-
+    
     public static TelegramResponseDelete deleteMessage(String token, long chat_id_to_delete, int message_id) {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseDelete telegram = null;
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "deleteMessage");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "deleteMessage");
             connection.putParameter("chat_id", chat_id_to_delete + "");
             connection.putParameter("message_id", message_id + "");
             try {
-                telegram = new TelegramResponseDelete(postTelegramMessage(connection));
+                telegram = new TelegramResponseDelete(TelegramBotConnection.postTelegramMessage(connection));
                 return telegram;
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
+                logger.errorToSend(error);
                 return telegram;
             }
         } else {
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             return telegram = null;
         }
-
+        
     }
-
-    public static void main(String[] args) {
-        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
-        ZLogFileWriter.setDefaultLogFileWriter(new ZVoidLogFileWriter());
-        TelegramUpdate x = getInstanceNoOffset(token);
-        String local = "C:\\";
-        System.out.println(downloadFile(x, local));
-        System.out.println("");
-    }
-
+    
     public static String getPathFile(String token, String file_id) {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseGetFile telegram = null;
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "getFile");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "getFile");
             connection.putParameter("file_id", file_id + "");
             try {
-                telegram = new TelegramResponseGetFile(postTelegramMessage(connection));
+                telegram = new TelegramResponseGetFile(TelegramBotConnection.postTelegramMessage(connection));
                 return telegram.file_path;
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao buscar informações");
-                System.out.println(error);
+                logger.errorToSend(error);
                 return null;
             }
         } else {
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             return null;
         }
     }
-
+    
     public static boolean downloadFile(TelegramUpdate instance, String local_download) {
-        if (!local_download.split("")[local_download.length()-1].equals("\\")) {
+        if (!local_download.split("")[local_download.length() - 1].equals("\\")) {
             System.out.println("Caminho \"" + local_download + "\" não é pasta");
             return false;
         } else {
@@ -143,21 +125,16 @@ public class ApiNeoBot {
                     new ZHttp().requestGet(url).send().saveAs(new File(local_download));
                     return true;
                 } catch (JSONException error) {
-                    SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                    Date x = new Date();
-                    System.out.println(dt.format(x));
-                    System.out.println("Erro ao baixar arquivo:\n{");
-                    System.out.println(error);
-                    System.out.println("\n}");
+                    logger.errorOnDownload(error);
                     return false;
                 }
             } else {
-                System.out.println("WTF is that token?");
+                logger.errorToken(instance.token);
                 return false;
             }
         }
     }
-
+    
     public static boolean downloadFile(String token, String local_download, String id_file) {
         if (!local_download.split("")[local_download.length()].equals("\\")) {
             System.out.println("Caminho \"" + local_download + "\" não é pasta");
@@ -171,53 +148,44 @@ public class ApiNeoBot {
                     new ZHttp().requestGet(url).send().saveAs(new File(local_download));
                     return true;
                 } catch (JSONException error) {
-                    SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                    Date x = new Date();
-                    System.out.println(dt.format(x));
-                    System.out.println("Erro ao baixar arquivo:\n{");
-                    System.out.println(error);
-                    System.out.println("\n}");
+                    logger.errorOnDownload(error);
                     return false;
                 }
             } else {
-                System.out.println("WTF is that token?");
+                logger.errorToken(token);
                 return false;
             }
         }
     }
-
+    
     public static TelegramResponseSend sendButton(String token, long chat_id_to_send, String text_to_send, String[] buttons) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
 //        JSONObject layoutedButtons = getButtons(buttons);
         JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTeclado(buttons);
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "sendMessage");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             connection.putParameter("reply_markup", matriz.toString());
             try {
-                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
                 return telegram;
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
+                logger.errorToSend(error);
                 return telegram;
             }
         } else {
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             return telegram = null;
         }
-
+        
     }
-
+    
     public static TelegramResponseSend sendButtonFly_url(String token, long chat_id_to_send, String text_to_send,
             String[] button_texts, String[] urls) throws JSONException {
         if (button_texts.length != urls.length) {
-            System.out.println("qt button texts <> qt urls");
+            logger.errorButtonFlyLayout("qt button texts <> qt urls");
             return null;
         } else {
             ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
@@ -225,32 +193,28 @@ public class ApiNeoBot {
 //        JSONObject layoutedButtons = getButtons(buttons);
             JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_url(button_texts, urls);
             if (validationToken(token)) {
-                ZHttpPost connection = connectApi(token, "sendMessage");
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.putParameter("text", text_to_send);
                 connection.putParameter("reply_markup", matriz.toString());
                 try {
-                    telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                    telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
                     return telegram;
                 } catch (JSONException error) {
-                    SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                    Date x = new Date();
-                    System.out.println(dt.format(x));
-                    System.out.println("Erro ao enviar");
-                    System.out.println(error);
+                    logger.errorToSend(error);
                     return telegram;
                 }
             } else {
-                System.out.println("WTF is that token?");
+                logger.errorToken(token);
                 return telegram = null;
             }
         }
     }
-
+    
     public static TelegramResponseSend sendButtonFly_callback(String token, long chat_id_to_send, String text_to_send,
             String[] button_texts, String[] callbacks) throws JSONException {
         if (button_texts.length != callbacks.length) {
-            System.out.println("qt button texts <> qt callbacks");
+            logger.errorButtonFlyLayout("qt button texts <> qt urls");
             return null;
         } else {
             ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
@@ -258,89 +222,69 @@ public class ApiNeoBot {
 //        JSONObject layoutedButtons = getButtons(buttons);
             JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_multilines(button_texts, callbacks);
             if (validationToken(token)) {
-                ZHttpPost connection = connectApi(token, "sendMessage");
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.putParameter("text", text_to_send);
                 connection.putParameter("reply_markup", matriz.toString());
                 try {
-                    telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                    telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
                     return telegram;
                 } catch (JSONException error) {
-                    SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                    Date x = new Date();
-                    System.out.println(dt.format(x));
-                    System.out.println("Erro ao enviar");
-                    System.out.println(error);
+                    logger.errorToSend(error);
                     return telegram;
                 }
             } else {
-                System.out.println("WTF is that token?");
+                logger.errorToken(token);
                 return telegram = null;
             }
         }
     }
-
+    
     public static TelegramResponseSend hideButtonWithMessage(String token, long chat_id_to_send, String text_to_send) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
         JSONObject objeto = new JSONObject();
         objeto.put("hide_keyboard", true);
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "sendMessage");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             connection.putParameter("reply_markup", objeto.toString());
             try {
-                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
-
+                logger.errorToSend(error);
             }
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             telegram = null;
         }
         return telegram;
     }
-
+    
     public static TelegramResponseSend hideButtonWithoutMessage(String token, long chat_id_to_send) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
         JSONObject objeto = new JSONObject();
         objeto.put("hide_keyboard", true);
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "sendMessage");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", "-");
             connection.putParameter("reply_markup", objeto.toString());
             try {
-                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
-
+                logger.errorToSend(error);
             }
+            TelegramResponseDelete deleteMessage = ApiNeoBot.deleteMessage(token, chat_id_to_send, telegram.message_id);
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             telegram = null;
         }
-        TelegramResponseDelete deleteMessage = ApiNeoBot.deleteMessage(token, chat_id_to_send, telegram.message_id);
         return telegram;
     }
-
+    
     public static boolean ApiNeoBotOffset(int update_id, String token) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         if (validationToken(token)) {
@@ -348,76 +292,58 @@ public class ApiNeoBot {
                 TelegramBotConnection.setOffset(update_id, token);
                 return true;
             } catch (Exception trynot) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Error in >>OFFSET<< command");
+                logger.errorOffset(trynot);
                 return false;
             }
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("Error in >>TOKEN<<");
+            logger.errorToken(token);
             return false;
         }
     }
-
+    
     public static TelegramUpdate getInstance(String token) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramUpdate t_update = null;
         if (validationToken(token)) {
             try {
-                String conteudojson = getTelegramjson(token);
+                String conteudojson = TelegramBotConnection.getTelegramjson(token);
                 t_update = new TelegramUpdate(conteudojson);
                 t_update.token = token;
                 TelegramBotConnection.setOffset(t_update.update_id, token);
                 return t_update;
             } catch (Exception trynot) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("I don't have messages");
+                logger.error("Erro ao buscar mensagens:" + trynot);
                 t_update.message.text = "I don't have messages";
                 return t_update;
             }
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             t_update = null;
             return t_update;
         }
     }
-
+    
     public static TelegramUpdate getInstanceNoOffset(String token) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramUpdate t_update = null;
         if (validationToken(token)) {
             try {
-                String conteudojson = getTelegramjson(token);
+                String conteudojson = TelegramBotConnection.getTelegramjson(token);
                 t_update = new TelegramUpdate(conteudojson);
                 t_update.token = token;
                 return t_update;
             } catch (Exception trynot) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("I don't have messages");
+                logger.error("Erro ao buscar mensagens:" + trynot);
                 t_update.message.text = "I don't have messages";
                 return t_update;
             }
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             t_update = null;
             return t_update;
         }
     }
-
+    
     public static boolean validationToken(String token) {
         boolean resposta = false;
         if (token.length() > 40 && !token.contains(" ")) {
@@ -425,264 +351,201 @@ public class ApiNeoBot {
         }
         return resposta;
     }
-
+    
     public static TelegramResponseSend sendReply(String token, long chat_id_to_send, String text_to_send, int message_id) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "sendMessage");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send + "");
             connection.putParameter("reply_to_message_id", message_id + "");
             try {
-                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
                 return telegram;
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar:\n{");
-                System.out.println(connection.parameterMap() + "\n");
-                System.out.println(error);
-                System.out.println("\n}");
+                logger.errorToReply(error, connection.parameterMap());
                 return telegram;
             }
         } else {
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             return telegram = null;
         }
-
+        
     }
-
+    
     public static TelegramResponseSend sendGif(String token, long chat_id_to_send, String gif_id) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "sendDocument");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendDocument");
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("document", gif_id);
             try {
-                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
                 return telegram;
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
+                logger.errorToSend(error);
                 return telegram;
             }
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             return telegram = null;
         }
     }
-
+    
     public static TelegramResponseSend sendAnswerCallbackQuery(String token,
             String callback_query_id, String text, boolean show_alert) {
         boolean retorno = false;
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "answerCallbackQuery");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "answerCallbackQuery");
             connection.putParameter("callback_query_id", callback_query_id + "");
             connection.putParameter("text", text);
             connection.putParameter("show_alert", show_alert + "");
             try {
-                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
                 return telegram;
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
+                logger.errorToSend(error);
                 return telegram;
             }
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             return telegram = null;
         }
     }
-
+    
     public static TelegramResponseSend sendGif(String token, long chat_id_to_send, String gif_id, String caption) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "sendDocument");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendDocument");
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("document", gif_id);
             connection.putParameter("caption", caption);
             try {
-                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
                 return telegram;
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
+                logger.errorToSend(error);
                 return telegram;
             }
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             return telegram = null;
         }
     }
-
+    
     public static boolean sendGifReply(String token, long chat_id_to_send, String gif_id, String caption, int message_to_reply) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         boolean resposta = false;
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "sendDocument");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendDocument");
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("document", gif_id);
             connection.putParameter("caption", caption);
             connection.putParameter("reply_to_message_id", message_to_reply + "");
             try {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println(connection.toString());
-                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+//                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+//                Date x = new Date();
+//                System.out.println(dt.format(x));
+//                System.out.println(connection.toString());
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
                 resposta = true;
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
+                logger.errorToSend(error);
                 resposta = false;
             }
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
         }
         return resposta;
     }
-
+    
     public static boolean sendFile(String token, long chat_id_to_send, String name_file, String pathFile) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         boolean resposta = false;
         if (validationToken(token)) {
             try {
                 final File arq = new File(pathFile);
-                ZHttpPost connection = connectApi(token, "sendDocument");
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendDocument");
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.sendFile("document", name_file, (long) pathFile.getBytes().length, new ByteArrayInputStream(pathFile.getBytes()));
                 resposta = true;
             } catch (Exception error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
+                logger.errorToSend(error);
                 resposta = false;
             }
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             resposta = false;
         }
         return resposta;
     }
-
+    
     public static TelegramResponseSend sendMarkdown(String token, long chat_id_to_send, String text_to_send, String parse_mode) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "sendMessage");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             connection.putParameter("parse_mode", parse_mode);
             try {
-                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
                 return telegram;
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
+                logger.errorToSend(error);
                 return telegram;
             }
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             return telegram = null;
         }
-
+        
     }
-
+    
     public static TelegramResponseSend send(String token, long chat_id_to_send, String text_to_send) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "sendMessage");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             try {
-                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
                 System.out.println("");
                 return telegram;
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
+                logger.errorToSend(error);
                 return telegram;
             }
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             return telegram = null;
         }
-
+        
     }
-
+    
     public static TelegramResponseSend send(String token, BigInteger chat_id_to_send, String text_to_send) {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
-            ZHttpPost connection = connectApi(token, "sendMessage");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             try {
-                telegram = new TelegramResponseSend(postTelegramMessage(connection));
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection));
                 return telegram;
             } catch (JSONException error) {
-                SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-                Date x = new Date();
-                System.out.println(dt.format(x));
-                System.out.println("Erro ao enviar");
-                System.out.println(error);
+                logger.errorToSend(error);
                 return telegram;
             }
         } else {
-            SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-            Date x = new Date();
-            System.out.println(dt.format(x));
-            System.out.println("WTF is that token?");
+            logger.errorToken(token);
             return telegram = null;
         }
-    }
-
+    }    
 }

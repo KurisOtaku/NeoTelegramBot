@@ -15,8 +15,6 @@ import br.zul.zwork2.log.ZLogFileWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,7 +26,7 @@ public class ApiNeoBot {
     
     public static void main(String[] args) {
         LoggerApiNeoBot obj = new LoggerApiNeoBot();
-//        obj.info("mkyong");
+        obj.info("teste");
         System.out.println("");
     }
     

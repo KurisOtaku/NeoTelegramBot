@@ -2,6 +2,7 @@ package api.kuris.telegrambot.neo;
 
 import java.util.Map;
 import org.apache.log4j.Logger;
+import org.apache.log4j.varia.NullAppender;
 import org.json.JSONException;
 
 /*
@@ -21,13 +22,13 @@ public class LoggerApiNeoBot {
     final static Logger logger = Logger.getLogger(LoggerApiNeoBot.class);
 
     void error(String parameter) {
+        logger.getRootLogger().removeAllAppenders();
+        logger.getRootLogger().addAppender(new NullAppender());
         logger.error("Error : " + parameter);
     }
 
     void info(String parameter) {
-        if (logger.isDebugEnabled()) {
-            logger.info("Info : " + parameter);
-        }
+        logger.info("Info : " + parameter);
     }
 
     void debug(String parameter) {
@@ -37,58 +38,40 @@ public class LoggerApiNeoBot {
     }
 
     void warn(String parameter) {
-        if (logger.isDebugEnabled()) {
-            logger.warn("This is warn : " + parameter);
-        }
+        logger.warn("This is warn : " + parameter);
     }
 
     void fatal(String parameter) {
-        if (logger.isDebugEnabled()) {
-            logger.fatal("This is fatal : " + parameter);
-        }
+        logger.fatal("This is fatal : " + parameter);
     }
 
     void errorToken(String parameter) {
-        if (logger.isDebugEnabled()) {
-            logger.error("Erro de Token : " + parameter);
-        }
+        logger.error("Erro de Token : " + parameter);
     }
 
     void errorToSend(JSONException error) {
-        if (logger.isDebugEnabled()) {
-            logger.error("Erro ao enviar : " + error);
-        }
+        logger.error("Erro ao enviar : " + error);
     }
 
     void errorToSend(Exception error) {
-        if (logger.isDebugEnabled()) {
-            logger.error("Erro ao enviar : " + error);
-        }
+        logger.error("Erro ao enviar : " + error);
     }
 
     void errorOnDownload(JSONException error) {
-        if (logger.isDebugEnabled()) {
-            logger.error("Erro ao realizar download : " + error);
-        }
+        logger.error("Erro ao realizar download : " + error);
     }
 
     void errorButtonFlyLayout(String error) {
-        if (logger.isDebugEnabled()) {
-            logger.error("Erro nos botões Flutuantes: " + error);
-        }
+        logger.error("Erro nos botões Flutuantes: " + error);
     }
 
     void errorOffset(Exception trynot) {
-        if (logger.isDebugEnabled()) {
-            logger.error("Error no comando OffSet: " + trynot);
-        }
+        logger.error("Error no comando OffSet: " + trynot);
     }
 
     void errorToReply(JSONException error, Map<String, String> parameterMap) {
-        if (logger.isDebugEnabled()) {
-            logger.error("Erro ao responder:");
-            logger.error(error);
-            logger.error(parameterMap);
-        }
+        logger.error("Erro ao responder:");
+        logger.error(error);
+        logger.error(parameterMap);
     }
 }

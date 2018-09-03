@@ -14,10 +14,10 @@ import org.json.JSONObject;
  */
 public class TelegramUpdateInline_query {
 
-    public String id;
-    public TelegramUpdateFrom from;
-    public String query;
-    public String offset;
+    protected String id;
+    protected TelegramUpdateFrom from;
+    protected String query;
+    protected String offset;
 
 
     public TelegramUpdateInline_query(JSONObject update) throws JSONException {

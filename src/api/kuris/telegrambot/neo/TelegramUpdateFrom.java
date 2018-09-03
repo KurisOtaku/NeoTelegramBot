@@ -14,12 +14,12 @@ import org.json.JSONObject;
  */
 public class TelegramUpdateFrom {
 
-    public int id_user;            // ID usuário (utilizar como parametro - confiavel)
-    public boolean is_bot;         // indicador de bot (se é que isso é possível)
-    public String first_name;      // primeiro nome do usuário (não usar como parametro)
-    public String last_name;       // sobrenome do usuário (não usar como parametro)
-    public String username;        // @<nome_do_usuario> (não usar como parametro)
-    public String language_code;   // informação sobre linguagem do app do usuário (caso seja necessário)
+    protected int id_user;            // ID usuário (utilizar como parametro - confiavel)
+    protected boolean is_bot;         // indicador de bot (se é que isso é possível)
+    protected String first_name;      // primeiro nome do usuário (não usar como parametro)
+    protected String last_name;       // sobrenome do usuário (não usar como parametro)
+    protected String username;        // @<nome_do_usuario> (não usar como parametro)
+    protected String language_code;   // informação sobre linguagem do app do usuário (caso seja necessário)
 
     public TelegramUpdateFrom(JSONObject message) throws JSONException {
         JSONObject from = message.getJSONObject("from");

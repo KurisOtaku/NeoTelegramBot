@@ -14,7 +14,7 @@ import org.json.JSONObject;
  *
  * @author cristiano.rosa
  */
-public class TelegramUpdate {
+public class TelegramResponseSendGif {
 
     protected String token;
     protected boolean exist_messages;
@@ -114,7 +114,58 @@ public class TelegramUpdate {
         return message;
     }
      */
-    public TelegramUpdate(String json, String token) throws JSONException {
+    
+    public TelegramResponseSendGif(String json, String token) throws JSONException {
+        System.out.println(json);
+        /*
+{
+  "ok": true,
+  "result": {
+    "message_id": 2722,
+    "from": {
+      "id": 304076906,
+      "is_bot": true,
+      "first_name": "Newaii 😴",
+      "username": "New_AI_bot"
+    },
+    "chat": {
+      "id": 52022517,
+      "first_name": "🇰 🇺 🇷 🇮 🇸",
+      "last_name": "クリス",
+      "username": "Kuris",
+      "type": "private"
+    },
+    "date": 1535826715,
+    "animation": {
+      "file_name": "giphy.mp4",
+      "mime_type": "video/mp4",
+      "duration": 3,
+      "width": 480,
+      "height": 272,
+      "thumb": {
+        "file_id": "AAQEABPqWmEZAATK5Ur2Q8m0tw0fAQABAg",
+        "file_size": 2273,
+        "width": 90,
+        "height": 51
+      },
+      "file_id": "CgADBAADj4sAAugaZAfrx4Ee7eHbvgI",
+      "file_size": 238798
+    },
+    "document": {
+      "file_name": "giphy.mp4",
+      "mime_type": "video/mp4",
+      "thumb": {
+        "file_id": "AAQEABPqWmEZAATK5Ur2Q8m0tw0fAQABAg",
+        "file_size": 2273,
+        "width": 90,
+        "height": 51
+      },
+      "file_id": "CgADBAADj4sAAugaZAfrx4Ee7eHbvgI",
+      "file_size": 238798
+    }
+  }
+}
+        */
         JSONObject jsonObj = new JSONObject(json);
         try {
             JSONArray results = jsonObj.getJSONArray("result");
@@ -153,4 +204,6 @@ public class TelegramUpdate {
 
     }
 
+
+    
 }

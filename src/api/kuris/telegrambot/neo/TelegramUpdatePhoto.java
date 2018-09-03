@@ -15,27 +15,36 @@ import org.json.JSONObject;
  */
 public class TelegramUpdatePhoto {
 
-    public String file_id;
-    public String caption;
+    protected String file_id;
 
-    public TelegramUpdatePhoto(JSONObject message)  throws JSONException{
+    protected String caption;
+    protected String format;
+
+    public TelegramUpdatePhoto(JSONObject message, String token) throws JSONException {
         JSONArray photo_array = message.getJSONArray("photo");
-        JSONObject photo_object = photo_array.getJSONObject(0);
+        JSONObject photo_object = photo_array.getJSONObject(photo_array.length() - 1);
         this.file_id = photo_object.getString("file_id");
-        try{
-            this.caption = photo_object.getString("caption");
-        } catch (JSONException tr3){
-            this.caption = "";
-        }
-        
+        photo_object = photo_array.getJSONObject(0);
+        String pathFile = ApiNeoBot.getPathFile(token, file_id);
+        String[] temp = pathFile.split("\\.");
+        this.format = temp[temp.length - 1];
+        this.caption = message.optString("caption", "");
     }
 
     public String getFile_id() {
         return file_id;
     }
-    
-    public String getCaption(){
+
+    public void caption(String caption) {
+        this.caption = caption;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public String getCaption() {
         return caption;
     }
-    
+
 }

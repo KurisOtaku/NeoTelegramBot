@@ -14,46 +14,93 @@ import org.json.JSONObject;
  */
 public class TelegramResponseSend {
 
-    public int error_code;
-    public String error_description;
+    protected int error_code;
+    protected String error_description;
 
-    public TelegramUpdateFrom from;
-    public TelegramUpdateChat chat;
-    public int date;
+    protected TelegramUpdateFrom from;
+    protected TelegramUpdateChat chat;
+    protected int date;
 
-    public String text;
-    public int message_id;
-    public boolean ok;
+    protected String text;
+    protected int message_id;
+    protected boolean ok;
 
-    public TelegramUpdateReply_to_message reply_to_message;
+    protected TelegramUpdateReply_to_message reply_to_message;
 
-    public TelegramResponseSend(String json) throws JSONException {
+    public int Error_code() {
+        return error_code;
+    }
+
+    public void Error_code(int error_code) {
+        this.error_code = error_code;
+    }
+
+    public String Error_description() {
+        return error_description;
+    }
+
+    public void Error_description(String error_description) {
+        this.error_description = error_description;
+    }
+
+    public int Message_id() {
+        return message_id;
+    }
+
+    public void Message_id(int message_id) {
+        this.message_id = message_id;
+    }
+
+    public boolean isOk() {
+        return ok;
+    }
+
+    public void Ok(boolean ok) {
+        this.ok = ok;
+    }
+
+    public TelegramUpdateReply_to_message Reply_to_message() {
+        return reply_to_message;
+    }
+
+    public void Reply_to_message(TelegramUpdateReply_to_message reply_to_message) {
+        this.reply_to_message = reply_to_message;
+    }
+
+    public TelegramResponseSend(String json, String token) throws JSONException {
         JSONObject jsonObj = new JSONObject(json);
-        try {
-            JSONObject result = jsonObj.getJSONObject("result");
-            this.message_id = result.getInt("message_id");
-            this.from = new TelegramUpdateFrom(result);
-            this.chat = new TelegramUpdateChat(result);
-            this.date = result.getInt("date");
-            this.text = result.getString("text");
+        boolean ok = jsonObj.getBoolean("ok");
+        if (ok) {
             try {
-                this.reply_to_message = new TelegramUpdateReply_to_message(result);
-            } catch (Exception replyError) {
+                JSONObject result = jsonObj.getJSONObject("result");
+                this.message_id = result.getInt("message_id");
+                this.from = new TelegramUpdateFrom(result);
+                this.chat = new TelegramUpdateChat(result);
+                this.date = result.getInt("date");
+                this.text = result.getString("text");
+                try {
+                    this.reply_to_message = new TelegramUpdateReply_to_message(result, token);
+                } catch (Exception replyError) {
+                    this.reply_to_message = null;
+                }
+                this.error_code = 0;
+                this.error_description = "#null";
+                this.ok = true;
+            } catch (Exception pegaErro1) {
+                this.ok = false;
+                this.message_id = 0;
+                this.from = null;
+                this.chat = null;
+                this.date = 0;
+                this.text = "#null";
                 this.reply_to_message = null;
+                this.error_code = new JSONObject(json).getInt("error_code");
+                this.error_description = new JSONObject(json).getString("description");
             }
-            this.error_code = 0;
-            this.error_description = "#null";
-            this.ok = true;
-        } catch (Exception pegaErro1) {
+        } else {
             this.ok = false;
-            this.message_id = 0;
-            this.from = null;
-            this.chat = null;
-            this.date = 0;
-            this.text = "#null";
-            this.reply_to_message = null;
-            this.error_code = new JSONObject(json).getInt("error_code");
-            this.error_description = new JSONObject(json).getString("description");
+            this.error_code = jsonObj.getInt("error_code");
+            this.error_description = jsonObj.getString("description");
         }
     }
 

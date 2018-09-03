@@ -15,9 +15,33 @@ import org.json.JSONObject;
  */
 public class TelegramResponseDelete {
 
-    public boolean ok;
-    public int error_code;
-    public String error_description;
+    protected boolean ok;
+    protected int error_code;
+    protected String error_description;
+
+    public boolean isOk() {
+        return ok;
+    }
+
+    public void Ok(boolean ok) {
+        this.ok = ok;
+    }
+
+    public int Error_code() {
+        return error_code;
+    }
+
+    public void Error_code(int error_code) {
+        this.error_code = error_code;
+    }
+
+    public String Error_description() {
+        return error_description;
+    }
+
+    public void Error_description(String error_description) {
+        this.error_description = error_description;
+    }
 
     public TelegramResponseDelete(String json) throws JSONException {
         JSONObject jsonObj = new JSONObject(json);

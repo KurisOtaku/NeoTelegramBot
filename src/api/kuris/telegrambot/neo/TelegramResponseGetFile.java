@@ -14,13 +14,61 @@ import org.json.JSONObject;
  */
 public class TelegramResponseGetFile {
 
-    public int error_code;
-    public String error_description;
+    protected int error_code;
+    protected String error_description;
 
-    public String file_id;
-    public int file_size;
-    public String file_path;
-    public boolean ok;
+    protected String file_id;
+    protected int file_size;
+    protected String file_path;
+    protected boolean ok;
+
+    public int Error_code() {
+        return error_code;
+    }
+
+    public void Error_code(int error_code) {
+        this.error_code = error_code;
+    }
+
+    public String Error_description() {
+        return error_description;
+    }
+
+    public void Error_description(String error_description) {
+        this.error_description = error_description;
+    }
+
+    public String File_id() {
+        return file_id;
+    }
+
+    public void File_id(String file_id) {
+        this.file_id = file_id;
+    }
+
+    public int File_size() {
+        return file_size;
+    }
+
+    public void File_size(int file_size) {
+        this.file_size = file_size;
+    }
+
+    public String File_path() {
+        return file_path;
+    }
+
+    public void File_path(String file_path) {
+        this.file_path = file_path;
+    }
+
+    public boolean isOk() {
+        return ok;
+    }
+
+    public void Ok(boolean ok) {
+        this.ok = ok;
+    }
 
     public TelegramResponseGetFile(String json) throws JSONException {
         JSONObject jsonObj = new JSONObject(json);
@@ -42,29 +90,4 @@ public class TelegramResponseGetFile {
             this.error_description = new JSONObject(json).getString("description");
         }
     }
-
-    public int getError_code() {
-        return error_code;
-    }
-
-    public String getError_description() {
-        return error_description;
-    }
-
-    public String getFile_id() {
-        return file_id;
-    }
-
-    public int getFile_size() {
-        return file_size;
-    }
-
-    public String getFile_path() {
-        return file_path;
-    }
-
-    public boolean isOk() {
-        return ok;
-    }
-
 }

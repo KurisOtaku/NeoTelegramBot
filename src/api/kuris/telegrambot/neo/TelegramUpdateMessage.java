@@ -16,23 +16,23 @@ import org.json.JSONObject;
  */
 public class TelegramUpdateMessage {
 
-    public int message_id;     // ID da mensagem (pode acabar repetindo)
-    public long date_long;           // Data da mensagem
-    public Date date;           // Data da mensagem
-    public String text;        // Item importante, mas não presente em algumas mensagens
-    public int forward_date;        // Item importante, mas não presente em algumas mensagens
-    public TelegramUpdateFrom from;
-    public TelegramUpdateForward_from forward_from;
-    public TelegramUpdateChat chat;
-    public TelegramUpdateEntities entities;
-    public TelegramUpdatePhoto photo;
-    public TelegramUpdateReply_to_message reply_to_message;
-    public TelegramUpdateSticker sticker;
-    public TelegramUpdateDocument document;
-    public TelegramUpdateLeft_chat left_chat;
-    public TelegramUpdateLocation location;
+    protected int message_id;     // ID da mensagem (pode acabar repetindo)
+    protected long date_long;           // Data da mensagem
+    protected Date date;           // Data da mensagem
+    protected String text;        // Item importante, mas não presente em algumas mensagens
+    protected int forward_date;        // Item importante, mas não presente em algumas mensagens
+    protected TelegramUpdateFrom from;
+    protected TelegramUpdateForward_from forward_from;
+    protected TelegramUpdateChat chat;
+    protected TelegramUpdateEntities entities;
+    protected TelegramUpdatePhoto photo;
+    protected TelegramUpdateReply_to_message reply_to_message;
+    protected TelegramUpdateSticker sticker;
+    protected TelegramUpdateDocument document;
+    protected TelegramUpdateLeft_chat left_chat;
+    protected TelegramUpdateLocation location;
 
-    public TelegramUpdateMessage(JSONObject message) throws JSONException {
+    public TelegramUpdateMessage(JSONObject message, String token) throws JSONException {
         this.message_id = message.getInt("message_id");
         this.date_long = message.getLong("date");
         this.date = new Date(new Timestamp(date_long*1000).getTime());
@@ -44,7 +44,7 @@ public class TelegramUpdateMessage {
             this.entities = null;
         }
         try {
-            this.photo = new TelegramUpdatePhoto(message);
+            this.photo = new TelegramUpdatePhoto(message, token);
         } catch (JSONException try2) {
             this.photo = null;
         }
@@ -63,7 +63,7 @@ public class TelegramUpdateMessage {
             }
         }
         try {
-            this.reply_to_message = new TelegramUpdateReply_to_message(message);
+            this.reply_to_message = new TelegramUpdateReply_to_message(message,token);
         } catch (JSONException try3) {
             this.reply_to_message = null;
         }
@@ -108,6 +108,10 @@ public class TelegramUpdateMessage {
         return date;
     }
 
+    public void text(String text) {
+        this.text = text;
+    }
+
     public String getText() {
         return text;
     }
@@ -150,6 +154,10 @@ public class TelegramUpdateMessage {
 
     public TelegramUpdateLeft_chat getLeft_chat() {
         return left_chat;
+    }
+
+    public TelegramUpdateLocation getLocation() {
+        return location;
     }
 
 }

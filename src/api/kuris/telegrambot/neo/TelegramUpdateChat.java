@@ -14,12 +14,12 @@ import org.json.JSONObject;
  */
 public class TelegramUpdateChat {
 
-    public long id_chat;            // ID do chat (grupo ou user)
-    public String first_name;      // se repete
-    public String last_name;       // se repete
-    public String username;        // se repete
-    public String type;            // tipo de chat (private, group...)
-    public String title;           // para grupos
+    protected long id_chat;            // ID do chat (grupo ou user)
+    protected String first_name;      // se repete
+    protected String last_name;       // se repete
+    protected String username;        // se repete
+    protected String type;            // tipo de chat (protected, group...)
+    protected String title;           // para grupos
 
     public TelegramUpdateChat(JSONObject message) throws JSONException {
         JSONObject chat = message.getJSONObject("chat");

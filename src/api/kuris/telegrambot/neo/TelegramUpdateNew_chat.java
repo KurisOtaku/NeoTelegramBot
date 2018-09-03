@@ -14,10 +14,10 @@ import org.json.JSONObject;
  */
 public class TelegramUpdateNew_chat {
 
-	public int id;
-    public boolean is_bot;
-    public String first_name;
-    public String username;
+    protected int id;
+    protected boolean is_bot;
+    protected String first_name;
+    protected String username;
 
     public TelegramUpdateNew_chat(JSONObject message) throws JSONException {
         JSONObject new_chat =  message.getJSONObject("new_chat_member");

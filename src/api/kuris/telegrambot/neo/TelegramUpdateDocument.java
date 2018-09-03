@@ -14,8 +14,8 @@ import org.json.JSONObject;
  */
 public class TelegramUpdateDocument {
 
-    public String file_name;
-    public String file_id; // se repete
+    protected String file_name;
+    protected String file_id; // se repete
 
     public TelegramUpdateDocument(JSONObject message) throws JSONException {
         JSONObject document = message.getJSONObject("document");

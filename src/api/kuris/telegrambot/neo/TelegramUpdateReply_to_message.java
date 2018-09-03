@@ -15,8 +15,8 @@ import org.json.JSONObject;
  */
 public class TelegramUpdateReply_to_message extends TelegramUpdateMessage {
 
-    public TelegramUpdateReply_to_message(JSONObject message) throws JSONException {
-        super(message.getJSONObject("reply_to_message") );
+    public TelegramUpdateReply_to_message(JSONObject message, String token) throws JSONException {
+        super(message.getJSONObject("reply_to_message"),token );
     }
 
     public int getMessage_id() {

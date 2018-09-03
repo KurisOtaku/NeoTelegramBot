@@ -15,9 +15,9 @@ import org.json.JSONObject;
  */
 public class TelegramUpdateEntities {
 
-    public int offset;
-    public int length;
-    public String type; // se repete mas com outros valores
+    protected int offset;
+    protected int length;
+    protected String type; // se repete mas com outros valores
 
     public TelegramUpdateEntities(JSONObject message) throws JSONException {
         JSONArray entities_array = message.getJSONArray("entities");
@@ -44,7 +44,7 @@ public class TelegramUpdateEntities {
         return offset;
     }
 
-    public int getLength() {
+    public int length() {
         return length;
     }
 

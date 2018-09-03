@@ -15,10 +15,10 @@ import org.json.JSONObject;
  */
 public class TelegramUpdateEdited_message extends TelegramUpdateMessage {
 
-    public int edit_date;           // Data de edição da mensagem
+    protected int edit_date;           // Data de edição da mensagem
 
-    public TelegramUpdateEdited_message(JSONObject message) throws JSONException {
-        super(message);
+    public TelegramUpdateEdited_message(JSONObject message,String token) throws JSONException {
+        super(message,token);
         this.edit_date = message.getInt("edit_date");
     }
 

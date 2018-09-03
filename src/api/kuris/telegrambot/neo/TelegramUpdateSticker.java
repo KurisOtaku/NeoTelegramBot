@@ -14,9 +14,9 @@ import org.json.JSONObject;
  */
 public class TelegramUpdateSticker {
 
-    public String emoji;               //Emoji do Sticker
-    public String set_name;            // Nome do pacote
-    public String file_id;             // ID do sticker (enviar este)
+    protected String emoji;               //Emoji do Sticker
+    protected String set_name;            // Nome do pacote
+    protected String file_id;             // ID do sticker (enviar este)
 
     public TelegramUpdateSticker(JSONObject message)  throws JSONException{
         JSONObject sticker = message.getJSONObject("sticker");

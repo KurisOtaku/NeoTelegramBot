@@ -14,11 +14,11 @@ import org.json.JSONObject;
  */
 public class TelegramUpdateLocation {
 
-    public double latitude_d;            // latitude double
-    public double longitude_d;            // longitude double
-    public String latitude_S;      // latitude String
-    public String longitude_S;       // longitude String
-    public String full_location;        // latitude e longitude
+    protected double latitude_d;            // latitude double
+    protected double longitude_d;            // longitude double
+    protected String latitude_S;      // latitude String
+    protected String longitude_S;       // longitude String
+    protected String full_location;        // latitude e longitude
 
     public TelegramUpdateLocation(JSONObject message) throws JSONException {
 //        try {
@@ -35,5 +35,9 @@ public class TelegramUpdateLocation {
 //            this.longitude_S = null;
 //            this.full_location = null;
 //        }
+    }
+
+    public String getFull_location() {
+        return full_location;
     }
 }

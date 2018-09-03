@@ -19,10 +19,10 @@ public class TelegramUpdateLeft_chat {
     String first_name_removed;
     String username_removed;
 */
-    public int id_remover;
-    public boolean is_bot_remover;
-    public String first_name_remover;
-    public String username_remover;
+    protected int id_remover;
+    protected boolean is_bot_remover;
+    protected String first_name_remover;
+    protected String username_remover;
 
     public TelegramUpdateLeft_chat(JSONObject message)  throws JSONException{
         JSONObject left_chat_remover = message.getJSONObject("left_chat_member");

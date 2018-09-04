@@ -433,12 +433,7 @@ public class ApiNeoBot {
 
     }
 
-    public static void main(String[] args) {
-        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
-        long masterid = 52022517l;
-        TelegramResponseSendGif sendGif = sendGif(token, masterid, "CgADBAADj4sAAugaZAfrx4Ee7eHbvgI");
-        System.out.println("");
-    }
+    
 
     public static TelegramResponseSendGif sendGif(String token, long chat_id_to_send, String gif_id) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));

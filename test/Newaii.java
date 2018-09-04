@@ -1,26 +1,29 @@
 
 import api.kuris.telegrambot.neo.ApiNeoBot;
+import static api.kuris.telegrambot.neo.ApiNeoBot.sendGif;
 import api.kuris.telegrambot.neo.TelegramResponseSend;
+import api.kuris.telegrambot.neo.TelegramResponseSendGif;
 import api.kuris.telegrambot.neo.TelegramUpdate;
 import br.zul.zwork2.log.ZLogFileWriter;
 import br.zul.zwork2.log.ZVoidLogFileWriter;
 import br.zul.zwork2.thread.ZThread;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.WritableRaster;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.imageio.ImageIO;
 
 public class Newaii {
 
     public static String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
+        long masterid = 52022517l;
+        TelegramResponseSendGif sendGif = sendGif(token, masterid, "CgADBAADj4sAAugaZAfrx4Ee7eHbvgI");
+        System.out.println("");
+    }
+
+    public static void main2(String[] args) throws IOException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZVoidLogFileWriter());
         ZLogFileWriter.getDefaultLogFileWriter().setInfoLogFile(null);
         ZLogFileWriter.getDefaultLogFileWriter().setWarningLogFile(null);
@@ -37,11 +40,12 @@ public class Newaii {
             new Thread(new Runnable() {
                 Date now = new Date();
                 String date = dateFormat.format(now);
+
                 @Override
                 public void run() {
                     now = new Date();
                     date = dateFormat.format(now);
-                 //   ApiNeoBot.send(token, masterid, date);
+                    //   ApiNeoBot.send(token, masterid, date);
                 }
             }).start();
             try {

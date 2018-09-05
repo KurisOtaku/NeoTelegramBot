@@ -40,7 +40,7 @@ public class TelegramBotConnection {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         String resposta = "";
         try {
-            resposta = request.send().getResponseText().toString();
+            resposta = request.send().getResponseText();
         } catch (Exception errorconnect) {
             resposta = "{\"ok\":false,\"error_code\":000,\"description\":\"By ApiNeoBot: Error don't find.\"}";
             System.out.println("erro ao conectar: ");
@@ -71,11 +71,12 @@ public class TelegramBotConnection {
                         + id_file);
         return x;
     }
+
     public static String urlApiFiles(String token, String id_file) {
         String x = "https://api.telegram.org/file/bot"
-                        + token
-                        + "/"
-                        + id_file;
+                + token
+                + "/"
+                + id_file;
         return x;
     }
 

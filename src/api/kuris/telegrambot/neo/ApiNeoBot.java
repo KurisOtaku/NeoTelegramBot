@@ -11,12 +11,10 @@ package api.kuris.telegrambot.neo;
 
 import br.zul.zwork2.http.ZHttp;
 import br.zul.zwork2.http.ZHttpPost;
-import br.zul.zwork2.http.ZHttpResponse;
 import br.zul.zwork2.log.ZLogFileWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -432,8 +430,6 @@ public class ApiNeoBot {
         }
 
     }
-
-    
 
     public static TelegramResponseSendGif sendGif(String token, long chat_id_to_send, String gif_id) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));

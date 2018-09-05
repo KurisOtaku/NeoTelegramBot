@@ -9,14 +9,11 @@
  */
 package api.kuris.telegrambot.neo;
 
-import br.zul.zwork2.http.ZHttp;
-import br.zul.zwork2.http.ZHttpPost;
+import br.zul.zwork2.http.*;
 import br.zul.zwork2.log.ZLogFileWriter;
-import java.io.ByteArrayInputStream;
-import java.io.File;
+import java.io.*;
 import java.math.BigInteger;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.*;
 
 /**
  *

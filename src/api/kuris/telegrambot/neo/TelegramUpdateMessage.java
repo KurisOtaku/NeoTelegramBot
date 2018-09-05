@@ -7,8 +7,7 @@ package api.kuris.telegrambot.neo;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.*;
 
 /**
  *

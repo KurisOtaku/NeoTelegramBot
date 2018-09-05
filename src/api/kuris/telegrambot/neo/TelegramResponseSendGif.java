@@ -5,7 +5,6 @@
  */
 package api.kuris.telegrambot.neo;
 
-import java.util.Date;
 import org.json.JSONObject;
 
 /**

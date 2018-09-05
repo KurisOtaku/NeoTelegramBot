@@ -5,8 +5,7 @@
  */
 package api.kuris.telegrambot.neo;
 
-import br.zul.zwork2.http.ZHttp;
-import br.zul.zwork2.http.ZHttpPost;
+import br.zul.zwork2.http.*;
 import br.zul.zwork2.log.ZLogFileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;

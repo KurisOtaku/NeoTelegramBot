@@ -5,8 +5,7 @@
  */
 package api.kuris.telegrambot.neo;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.*;
 
 /**
  *

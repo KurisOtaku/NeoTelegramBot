@@ -103,7 +103,7 @@ public class TelegramUpdate {
     public Date date() {
         return message.date;
     }
-
+     
     public TelegramUpdateFrom userInfo() {
         return message.from;
     }

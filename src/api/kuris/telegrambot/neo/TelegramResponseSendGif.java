@@ -24,6 +24,42 @@ public class TelegramResponseSendGif {
     protected TelegramUpdateDocument document;
     protected TelegramUpdateChat chat;
 
+    public String getToken() {
+        return token;
+    }
+
+    public String getFile_id() {
+        return file_id;
+    }
+
+    public int getFile_size() {
+        return file_size;
+    }
+
+    public int getMessage_id() {
+        return message_id;
+    }
+
+    public String getError_description() {
+        return error_description;
+    }
+
+    public int getError_code() {
+        return error_code;
+    }
+
+    public boolean isOk() {
+        return ok;
+    }
+
+    public TelegramUpdateDocument getDocument() {
+        return document;
+    }
+
+    public TelegramUpdateChat getChat() {
+        return chat;
+    }
+
     public TelegramResponseSendGif(String json, String token) {
         JSONObject jsonObj = new JSONObject(json);
         try {

@@ -1,9 +1,7 @@
 
 import api.kuris.telegrambot.neo.ApiNeoBot;
-import static api.kuris.telegrambot.neo.ApiNeoBot.sendGif;
-import api.kuris.telegrambot.neo.TelegramResponseSend;
-import api.kuris.telegrambot.neo.TelegramResponseSendGif;
-import api.kuris.telegrambot.neo.TelegramUpdate;
+import static api.kuris.telegrambot.neo.ApiNeoBot.*;
+import api.kuris.telegrambot.neo.*;
 import br.zul.zwork2.log.ZLogFileWriter;
 import br.zul.zwork2.log.ZVoidLogFileWriter;
 import br.zul.zwork2.thread.ZThread;
@@ -19,7 +17,8 @@ public class Newaii {
     public static void main(String[] args) {
         String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
         long masterid = 52022517l;
-        TelegramResponseSendGif sendGif = sendGif(token, masterid, "CgADBAADj4sAAugaZAfrx4Ee7eHbvgI");
+        TelegramResponseSendGif sendGif = sendGifReply(token, masterid, 3279, "CgADBAADj4sAAugaZAfrx4Ee7eHbvgI");
+        //TelegramResponseSticker sendSticker = sendStickerReply(token, masterid, 3279, "CAADAgADFgMAAs7Y6As05HgrRUxSGAI");
         System.out.println("");
     }
 

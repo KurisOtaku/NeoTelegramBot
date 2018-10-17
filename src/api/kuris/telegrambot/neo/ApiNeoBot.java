@@ -45,6 +45,29 @@ public class ApiNeoBot {
         }
     }
 
+    public static TelegramResponseSticker sendStickerReply(String token, long chat_id, int message_id_to_reply, String sticker) {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseSticker telegram = null;
+        if (validationToken(token)) {
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendSticker");
+            connection.putParameter("chat_id", chat_id + "");
+            connection.putParameter("reply_to_message_id", message_id_to_reply + "");
+            connection.putParameter("sticker", sticker);
+            try {
+                telegram = new TelegramResponseSticker(TelegramBotConnection.postTelegramMessage(connection));
+                return telegram;
+            } catch (JSONException error) {
+                logger.errorToSend(error);
+                return telegram;
+            }
+
+            // LOG4J  - para logs
+        } else {
+            logger.errorToken(token);
+            return telegram = null;
+        }
+    }
+
     public static TelegramResponseSticker sendSticker(String token, long chat_id, String sticker) {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSticker telegram = null;
@@ -428,6 +451,28 @@ public class ApiNeoBot {
 
     }
 
+    public static TelegramResponseSendGif sendGifReply(String token, long chat_id_to_send, int message_id_to_reply, String gif_id) throws JSONException {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseSendGif telegram = null;
+        if (validationToken(token)) {
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendAnimation");
+            connection.putParameter("chat_id", chat_id_to_send + "");
+            connection.putParameter("reply_to_message_id", message_id_to_reply + "");
+            connection.putParameter("animation", gif_id);
+            try {
+                String postTelegramMessage = TelegramBotConnection.postTelegramMessage(connection);
+                telegram = new TelegramResponseSendGif(postTelegramMessage, token);
+                return telegram;
+            } catch (JSONException error) {
+                logger.errorToSend(error);
+                return telegram;
+            }
+        } else {
+            logger.errorToken(token);
+            return telegram = null;
+        }
+    }
+
     public static TelegramResponseSendGif sendGif(String token, long chat_id_to_send, String gif_id) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSendGif telegram = null;
@@ -559,7 +604,27 @@ public class ApiNeoBot {
         }
         return resposta;
     }
-
+   public static boolean sendFile(String token, long chat_id_to_send, String pathFile) throws JSONException {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        boolean resposta = false;
+        if (validationToken(token)) {
+            try {
+                final File arq = new File(pathFile);
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendDocument");
+                connection.putParameter("chat_id", chat_id_to_send + "");
+                connection.sendFile("document", arq);
+                resposta = true;
+            } catch (Exception error) {
+                logger.errorToSend(error);
+                resposta = false;
+            }
+        } else {
+            logger.errorToken(token);
+            resposta = false;
+        }
+        return resposta;
+    }
+   
     public static boolean sendFile(String token, long chat_id_to_send, String name_file, String pathFile) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         boolean resposta = false;

@@ -6,6 +6,7 @@
 package api.kuris.telegrambot.neo;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.json.*;
 
@@ -104,7 +105,14 @@ public class TelegramUpdateMessage {
     }
 
     public Date getDate() {
-        return date;
+        
+        return date;        
+    }
+
+    public String dateString() {
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy HH:mm:ss");
+        String dateString = format.format(date);
+        return dateString;        
     }
 
     public void text(String text) {

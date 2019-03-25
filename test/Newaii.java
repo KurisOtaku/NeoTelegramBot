@@ -9,12 +9,65 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class Newaii {
 
     public static String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
+    static long masterid = 52022517l;
+
+    public static void main4(String[] args) {
+
+        //COMO EDITAR BOTÕES FLUTUANTES COM CALLBACK?
+        ZLogFileWriter.setDefaultLogFileWriter(new ZVoidLogFileWriter());
+        ZLogFileWriter.getDefaultLogFileWriter().setInfoLogFile(null);
+        ZLogFileWriter.getDefaultLogFileWriter().setWarningLogFile(null);
+        ZLogFileWriter.getDefaultLogFileWriter().setErrorLogFile(null);
+        String[] array = {"array"};
+        String[] array2 = {masterid + "_array"};
+        ApiNeoBot.sendButtonFly_callback(token, masterid, "Teste", array, array2);
+        while (true) {
+            ZThread.sleep(1000);
+            TelegramUpdate x = null;
+            try {
+                x = ApiNeoBot.getInstance(token);
+                if (x.isExist_messages()) {
+                    if (x.Callback_query().Data().contains("_array")) {
+                        ApiNeoBot.editMessage(token, masterid, x.messageId(), "Atualizado!");
+                        System.out.println("");
+                    }
+                }
+            } catch (Exception try1) {
+                //sem mensagem
+                try1.printStackTrace();
+                System.out.println("erro");
+            }
+        }
+    }
 
     public static void main(String[] args) {
+        String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
+        long masterid = 52022517l;
+        while (true) {
+            TelegramUpdate i = getInstance(token);
+
+            try {
+                if (i.Inline_query() != null) {
+                    //if (i.Inline_query().getFrom().getId_user() == masterid) {
+                        TelegramUpdateInline_query q = i.Inline_query();
+                        ApiNeoBot.sendAnswerInlineQuery(token, q.getId(),
+                                q.getQuery(), "Isso é um "+q.getQuery()+" de "
+                        +q.getFrom().getFirst_name());
+                   // }
+                }
+            } catch (Exception d) {
+
+            }
+        }
+
+    }
+
+    public static void main1(String[] args) {
         String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
         long masterid = 52022517l;
         TelegramResponseSendGif sendGif = sendGifReply(token, masterid, 3279, "CgADBAADj4sAAugaZAfrx4Ee7eHbvgI");
@@ -55,7 +108,7 @@ public class Newaii {
         }
     }
 
-    public static void main1(String[] args) {
+    public static void main3(String[] args) {
         ZLogFileWriter.setDefaultLogFileWriter(new ZVoidLogFileWriter());
         ZLogFileWriter.getDefaultLogFileWriter().setInfoLogFile(null);
         ZLogFileWriter.getDefaultLogFileWriter().setWarningLogFile(null);

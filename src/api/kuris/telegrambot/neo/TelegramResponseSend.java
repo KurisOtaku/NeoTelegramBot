@@ -26,6 +26,8 @@ public class TelegramResponseSend {
 
     protected TelegramUpdateReply_to_message reply_to_message;
 
+    protected String token;
+
     public int Error_code() {
         return error_code;
     }
@@ -44,6 +46,10 @@ public class TelegramResponseSend {
 
     public int Message_id() {
         return message_id;
+    }
+
+    public String token() {
+        return token;
     }
 
     public void Message_id(int message_id) {
@@ -84,6 +90,7 @@ public class TelegramResponseSend {
                 }
                 this.error_code = 0;
                 this.error_description = "#null";
+                this.token = token;
                 this.ok = true;
             } catch (Exception pegaErro1) {
                 this.ok = false;
@@ -95,9 +102,11 @@ public class TelegramResponseSend {
                 this.reply_to_message = null;
                 this.error_code = new JSONObject(json).getInt("error_code");
                 this.error_description = new JSONObject(json).getString("description");
+                this.token = token;
             }
         } else {
             this.ok = false;
+            this.token = token;
             this.error_code = jsonObj.getInt("error_code");
             this.error_description = jsonObj.getString("description");
         }

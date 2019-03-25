@@ -21,9 +21,14 @@ public class TelegramUpdate {
     protected TelegramUpdateEdited_message edited_message;
     protected TelegramUpdateInline_query inline_query;
     protected TelegramUpdateCallback_query callback_query;
+    protected boolean callback;
 
     public String Token() {
         return token;
+    }
+
+    public boolean isCallback() {
+        return callback;
     }
 
     public void Token(String token) {
@@ -78,7 +83,6 @@ public class TelegramUpdate {
     public void text(String text) {
         this.message.text = text;
     }
-    
 
     public String text() {
         if (message == null) {
@@ -103,7 +107,7 @@ public class TelegramUpdate {
     public Date date() {
         return message.date;
     }
-     
+
     public TelegramUpdateFrom userInfo() {
         return message.from;
     }
@@ -136,8 +140,10 @@ public class TelegramUpdate {
             }
             try {
                 this.callback_query = new TelegramUpdateCallback_query(updates.getJSONObject("callback_query"), token);
+                this.callback = true;
             } catch (Exception tr9) {
                 this.callback_query = null;
+                this.callback = false;
             }
             try {
                 this.inline_query = new TelegramUpdateInline_query(updates);

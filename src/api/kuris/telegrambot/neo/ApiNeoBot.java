@@ -278,6 +278,28 @@ public class ApiNeoBot {
 
     }
 
+    public TelegramResponseSend sendMarkdown(long chat_id_to_send, String text_to_send, String parse_mode) throws JSONException {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseSend telegram = null;
+        if (validationToken(token)) {
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.putParameter("chat_id", chat_id_to_send + "");
+            connection.putParameter("text", text_to_send);
+            connection.putParameter("parse_mode", parse_mode);
+            try {
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                return telegram;
+            } catch (JSONException error) {
+                logger.errorToSend(error);
+                return telegram;
+            }
+        } else {
+            logger.errorToken(token);
+            return telegram = null;
+        }
+
+    }
+
     /*//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//
         A PARTIR DAQUI É STATIC TODOS OS METODOS ABAIXO SERÃO REFEITOS 
         PARA OS NON-STATIC

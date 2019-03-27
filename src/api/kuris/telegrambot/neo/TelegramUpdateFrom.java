@@ -13,7 +13,7 @@ import org.json.*;
  */
 public class TelegramUpdateFrom {
 
-    protected int id_user;            // ID usuário (utilizar como parametro - confiavel)
+    protected long id_user;            // ID usuário (utilizar como parametro - confiavel)
     protected boolean is_bot;         // indicador de bot (se é que isso é possível)
     protected String first_name;      // primeiro nome do usuário (não usar como parametro)
     protected String last_name;       // sobrenome do usuário (não usar como parametro)
@@ -22,7 +22,7 @@ public class TelegramUpdateFrom {
 
     public TelegramUpdateFrom(JSONObject message) throws JSONException {
         JSONObject from = message.getJSONObject("from");
-        this.id_user = from.getInt("id");
+        this.id_user = Long.valueOf(String.valueOf(from.getInt("id")));
         this.is_bot = from.getBoolean("is_bot");
         this.first_name = from.getString("first_name");
         try {
@@ -42,7 +42,7 @@ public class TelegramUpdateFrom {
         }
     }
 
-    public int getId_user() {
+    public long getId_user() {
         return id_user;
     }
 

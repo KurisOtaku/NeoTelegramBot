@@ -23,6 +23,11 @@ public class TelegramUpdate {
     protected TelegramUpdateCallback_query callback_query;
     protected boolean callback;
     protected boolean textMessage;
+    protected boolean inline;
+
+    public boolean isInline() {
+        return inline;
+    }
 
     public String Token() {
         return token;
@@ -131,6 +136,9 @@ public class TelegramUpdate {
             } catch (Exception tr_update) {
                 this.update_id = 0;
             }
+            this.textMessage = false;
+            this.callback = false;
+            this.inline = false;
             try {
                 try {
                     this.message = new TelegramUpdateMessage(updates.getJSONObject("message"), token);
@@ -139,6 +147,7 @@ public class TelegramUpdate {
                     this.message = null;
                     this.edited_message = new TelegramUpdateEdited_message(updates.getJSONObject("edited_message"), token);
                 }
+                this.textMessage = true;
             } catch (Exception tr6) {
                 this.message = null;
                 this.edited_message = null;
@@ -146,14 +155,12 @@ public class TelegramUpdate {
             try {
                 this.callback_query = new TelegramUpdateCallback_query(updates.getJSONObject("callback_query"), token);
                 this.callback = true;
-                this.textMessage = false;
             } catch (Exception tr9) {
                 this.callback_query = null;
-                this.callback = false;
-                this.textMessage = true;
             }
             try {
                 this.inline_query = new TelegramUpdateInline_query(updates);
+                this.inline = true;
             } catch (Exception tr5) {
                 this.inline_query = null;
             }

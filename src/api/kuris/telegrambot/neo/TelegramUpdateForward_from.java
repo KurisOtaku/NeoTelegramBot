@@ -18,7 +18,7 @@ public class TelegramUpdateForward_from  extends  TelegramUpdateFrom {
         super(message.getJSONObject("forward_form"));
     }
 
-    public int getId_user() {
+    public long getId_user() {
         return id_user;
     }
 

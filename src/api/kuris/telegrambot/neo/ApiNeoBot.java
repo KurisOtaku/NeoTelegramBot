@@ -27,6 +27,14 @@ public class ApiNeoBot {
 
     private String token;
     private long id_master;
+
+    public long getId_master() {
+        return id_master;
+    }
+
+    public long getId_chat_main() {
+        return id_chat_main;
+    }
     private long id_chat_main;
 
     public ApiNeoBot(String token, long id_master, long id_chat_main) throws Throwable {
@@ -204,6 +212,38 @@ public class ApiNeoBot {
             }
         }
     }
+    
+    public TelegramResponseSend sendButtonFly_callback(long chat_id_to_send, String text_to_send,
+            String[] button_texts, String[] callbacks, String switch_pm_text) throws JSONException {
+        if (button_texts.length != callbacks.length) {
+            logger.errorButtonFlyLayout("qt button texts <> qt urls");
+            return null;
+        } else {
+            ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+            TelegramResponseSend telegram = null;
+//        JSONObject layoutedButtons = getButtons(buttons);
+            // JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_multilines(button_texts, callbacks);
+            JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_equilibrado(button_texts, callbacks);
+            if (validationToken(token)) {
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.putParameter("chat_id", chat_id_to_send + "");
+                connection.putParameter("text", text_to_send);
+                connection.putParameter("switch_pm_text",switch_pm_text);
+                connection.putParameter("switch_pm_parameter",switch_pm_text);
+                connection.putParameter("reply_markup", matriz.toString());
+                try {
+                    telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                    return telegram;
+                } catch (JSONException error) {
+                    logger.errorToSend(error);
+                    return telegram;
+                }
+            } else {
+                logger.errorToken(token);
+                return telegram = null;
+            }
+        }
+    }
 
     public TelegramResponseSend sendButtonFly_callback(long chat_id_to_send, String text_to_send,
             String[] button_texts, String[] callbacks) throws JSONException {
@@ -298,6 +338,80 @@ public class ApiNeoBot {
             return telegram = null;
         }
 
+    }
+
+    public TelegramResponseSend sendAnswerInlineQuery(String inline_query_id,
+            String titles[], String text[], String switch_pm_text) {
+        TelegramResponseSend telegram = null;
+        if (validationToken(token)) {
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "answerInlineQuery");
+            connection.putParameter("inline_query_id", inline_query_id + "");
+            connection.putParameter("switch_pm_text", switch_pm_text);
+            JSONArray results
+                    = TelegramInlineQueryResultArticle
+                            .montaInlineQueryResultArticle("article", titles, text);
+            connection.putParameter("results", results.toString());
+            try {
+                String postTelegramMessage = TelegramBotConnection.postTelegramMessage(connection);
+                telegram = new TelegramResponseSend(postTelegramMessage, token);
+                return telegram;
+            } catch (JSONException error) {
+                logger.errorToSend(error);
+                return telegram;
+            }
+        } else {
+            logger.errorToken(token);
+            return telegram = null;
+        }
+    }
+
+    public TelegramResponseSend sendAnswerInlineQuery(String inline_query_id,
+            String titles[], String text[]) {
+        TelegramResponseSend telegram = null;
+        if (validationToken(token)) {
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "answerInlineQuery");
+            connection.putParameter("inline_query_id", inline_query_id + "");
+            JSONArray results
+                    = TelegramInlineQueryResultArticle
+                            .montaInlineQueryResultArticle("article", titles, text);
+            connection.putParameter("results", results.toString());
+            try {
+                String postTelegramMessage = TelegramBotConnection.postTelegramMessage(connection);
+                telegram = new TelegramResponseSend(postTelegramMessage, token);
+                return telegram;
+            } catch (JSONException error) {
+                logger.errorToSend(error);
+                return telegram;
+            }
+        } else {
+            logger.errorToken(token);
+            return telegram = null;
+        }
+    }
+
+    public TelegramResponseSend sendButton(long chat_id_to_send, String text_to_send, String[] buttons
+    , String switch_inline_query) throws JSONException {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseSend telegram = null;
+//        JSONObject layoutedButtons = getButtons(buttons);
+        JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTeclado(buttons);
+        if (validationToken(token)) {
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.putParameter("chat_id", chat_id_to_send + "");
+            connection.putParameter("text", text_to_send);
+            connection.putParameter("switch_inline_query", switch_inline_query);
+            connection.putParameter("reply_markup", matriz.toString());
+            try {
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                return telegram;
+            } catch (JSONException error) {
+                logger.errorToSend(error);
+                return telegram;
+            }
+        } else {
+            logger.errorToken(token);
+            return telegram = null;
+        }
     }
 
     /*//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//
@@ -1096,4 +1210,5 @@ public class ApiNeoBot {
             return telegram = null;
         }
     }
+
 }

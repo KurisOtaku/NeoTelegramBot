@@ -45,24 +45,18 @@ public class Newaii {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable {
         String token = "304076906:AAFjEZWRm2CkOVDuEvIfOnfz0LlNRY87P4A";
         long masterid = 52022517l;
-        while (true) {
-            TelegramUpdate i = getInstance(token);
-
-            try {
-                if (i.Inline_query() != null) {
-                    //if (i.Inline_query().getFrom().getId_user() == masterid) {
-                        TelegramUpdateInline_query q = i.Inline_query();
-                        ApiNeoBot.sendAnswerInlineQuery(token, q.getId(),
-                                q.getQuery(), "Isso é um "+q.getQuery()+" de "
-                        +q.getFrom().getFirst_name());
-                   // }
-                }
-            } catch (Exception d) {
-
-            }
+        try {
+            ApiNeoBot a = new ApiNeoBot(token, masterid, -masterid);
+            a.sendVerticalButtonFly_callback(
+                    masterid,
+                    "Teste",
+                    "a;aserasrasrb;c;ddafasdfaesfa;e;f;aserfafaseawsg;h;i".split(";"),
+                    "a;b;c;d;e;f;g;h;i".split(";"));
+        } catch (Exception d) {
+            d.printStackTrace();
         }
 
     }

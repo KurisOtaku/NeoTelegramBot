@@ -38,21 +38,43 @@ public class ApiNeoBot {
     private long id_chat_main;
 
     public ApiNeoBot(String token, long id_master, long id_chat_main) throws Throwable {
-        if (id_master <= 0) {
-            throw new Throwable("ID MESTRE DEVE SER MAIOR QUE ZERO");
+        try {
+            if (id_master <= 0) {
+                throw new Throwable("ID MESTRE DEVE SER MAIOR QUE ZERO");
+            }
+            if (id_chat_main >= 0) {
+                throw new Throwable("ID MESTRE DEVE SER MENOR QUE ZERO");
+            }
+            if (token.equals("") || token.contains(" ")) {
+                throw new Throwable("HÁ ERROS NO TOKEN");
+            }
+            if (token.contains("bot")) {
+                token = token.replace("bot", "");
+            }
+            this.token = token;
+            this.id_master = id_master;
+            this.id_chat_main = id_chat_main;
+
+            TelegramResponseSend send = send(id_master, "Bot ONLINE");
+            if (send.ok) {
+                System.out.println("BOT ONLINE");
+            } else {
+                System.out.println("BOT OFFLINE");
+                throw new Throwable("Ocorreu um erro. Verifique os seguintes itens:\n"
+                        + "- Conexão com internet;\n"
+                        + "- Token;\n"
+                        + "- ID mestre (usado na avaliação);\n"
+                        + "- Chat com o bot deve estar no mínimo iniciado para que o mesmo possa enviar uma mensagem;\n"
+                        + "- Acredita em Deus(es)?");
+            }
+        } catch (Throwable throwable) {
+            throwable = new Throwable("Ocorreu um erro. Verifique os seguintes itens:\n"
+                    + "- Conexão com internet;\n"
+                    + "- Token;\n"
+                    + "- ID mestre (usado na avaliação);\n"
+                    + "- Chat com o bot deve estar no mínimo iniciado para que o mesmo possa enviar uma mensagem;\n"
+                    + "- Acredita em Deus(es)?");
         }
-        if (id_chat_main >= 0) {
-            throw new Throwable("ID MESTRE DEVE SER MENOR QUE ZERO");
-        }
-        if (token.equals("") || token.contains(" ")) {
-            throw new Throwable("HÁ ERROS NO TOKEN");
-        }
-        if (token.contains("bot")) {
-            token = token.replace("bot", "");
-        }
-        this.token = token;
-        this.id_master = id_master;
-        this.id_chat_main = id_chat_main;
     }
 
     /**
@@ -212,7 +234,7 @@ public class ApiNeoBot {
             }
         }
     }
-    
+
     public TelegramResponseSend sendButtonFly_callback(long chat_id_to_send, String text_to_send,
             String[] button_texts, String[] callbacks, String switch_pm_text) throws JSONException {
         if (button_texts.length != callbacks.length) {
@@ -228,8 +250,8 @@ public class ApiNeoBot {
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.putParameter("text", text_to_send);
-                connection.putParameter("switch_pm_text",switch_pm_text);
-                connection.putParameter("switch_pm_parameter",switch_pm_text);
+                connection.putParameter("switch_pm_text", switch_pm_text);
+                connection.putParameter("switch_pm_parameter", switch_pm_text);
                 connection.putParameter("reply_markup", matriz.toString());
                 try {
                     telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
@@ -256,6 +278,36 @@ public class ApiNeoBot {
 //        JSONObject layoutedButtons = getButtons(buttons);
             // JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_multilines(button_texts, callbacks);
             JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_equilibrado(button_texts, callbacks);
+            if (validationToken(token)) {
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.putParameter("chat_id", chat_id_to_send + "");
+                connection.putParameter("text", text_to_send);
+                connection.putParameter("reply_markup", matriz.toString());
+                try {
+                    telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                    return telegram;
+                } catch (JSONException error) {
+                    logger.errorToSend(error);
+                    return telegram;
+                }
+            } else {
+                logger.errorToken(token);
+                return telegram = null;
+            }
+        }
+    }
+
+    public TelegramResponseSend sendVerticalButtonFly_callback(long chat_id_to_send, String text_to_send,
+            String[] button_texts, String[] callbacks) throws JSONException {
+        if (button_texts.length != callbacks.length) {
+            logger.errorButtonFlyLayout("qt button texts <> qt urls");
+            return null;
+        } else {
+            ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+            TelegramResponseSend telegram = null;
+//        JSONObject layoutedButtons = getButtons(buttons);
+            // JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_multilines(button_texts, callbacks);
+            JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_multilines(button_texts, callbacks);
             if (validationToken(token)) {
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
                 connection.putParameter("chat_id", chat_id_to_send + "");
@@ -389,8 +441,8 @@ public class ApiNeoBot {
         }
     }
 
-    public TelegramResponseSend sendButton(long chat_id_to_send, String text_to_send, String[] buttons
-    , String switch_inline_query) throws JSONException {
+    public TelegramResponseSend sendButton(long chat_id_to_send, String text_to_send, String[] buttons,
+            String switch_inline_query) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
 //        JSONObject layoutedButtons = getButtons(buttons);

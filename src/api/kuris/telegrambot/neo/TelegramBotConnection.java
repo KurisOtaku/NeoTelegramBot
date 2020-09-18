@@ -43,7 +43,7 @@ public class TelegramBotConnection {
         } catch (Exception errorconnect) {
             resposta = "{\"ok\":false,\"error_code\":000,\"description\":\"By ApiNeoBot: Error don't find.\"}";
             System.out.println("erro ao conectar: ");
-            System.out.println(errorconnect);
+            errorconnect.printStackTrace();
         }
         return resposta;
     }

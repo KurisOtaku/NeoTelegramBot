@@ -19,6 +19,7 @@ public class TelegramResponseSend {
     protected TelegramUpdateFrom from;
     protected TelegramUpdateChat chat;
     protected int date;
+    protected TelegramUpdateDice dice;
 
     protected String text;
     protected int message_id;
@@ -77,26 +78,45 @@ public class TelegramResponseSend {
         boolean ok = jsonObj.getBoolean("ok");
         if (ok) {
             try {
-                JSONObject result = jsonObj.getJSONObject("result");
-                this.message_id = result.getInt("message_id");
-                this.from = new TelegramUpdateFrom(result);
-                this.chat = new TelegramUpdateChat(result);
-                this.date = result.getInt("date");
-                this.text = result.getString("text");
+                JSONObject result;
+                boolean b_result;
                 try {
-                    this.reply_to_message = new TelegramUpdateReply_to_message(result, token);
-                } catch (Exception replyError) {
-                    this.reply_to_message = null;
+                    result = jsonObj.getJSONObject("result");
+                    this.message_id = result.getInt("message_id");
+                    this.from = new TelegramUpdateFrom(result);
+                    this.chat = new TelegramUpdateChat(result);
+                    this.date = result.getInt("date");
+
+                    try {
+                        this.text = result.getString("text");
+                    } catch (JSONException jSONException) {
+                        this.text = null;
+                    }
+
+                    try {
+                        this.reply_to_message = new TelegramUpdateReply_to_message(result, token);
+                    } catch (Exception replyError) {
+                        this.reply_to_message = null;
+                    }
+                    try {
+                        this.dice = new TelegramUpdateDice(result);
+                    } catch (Exception replyError) {
+                        this.dice = null;
+                    }
+                    this.error_code = 0;
+                    this.error_description = "#null";
+                    this.token = token;
+                } catch (Exception ex) {
+                    b_result = jsonObj.getBoolean("result");
+                    this.ok = b_result;
                 }
-                this.error_code = 0;
-                this.error_description = "#null";
-                this.token = token;
                 this.ok = true;
             } catch (Exception pegaErro1) {
                 this.ok = false;
                 this.message_id = 0;
                 this.from = null;
                 this.chat = null;
+                this.dice = null;
                 this.date = 0;
                 this.text = "#null";
                 this.reply_to_message = null;
@@ -122,6 +142,10 @@ public class TelegramResponseSend {
 
     public int getDate() {
         return date;
+    }
+
+    public TelegramUpdateDice getDice() {
+        return dice;
     }
 
     public String getText() {

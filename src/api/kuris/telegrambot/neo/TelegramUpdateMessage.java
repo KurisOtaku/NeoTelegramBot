@@ -31,6 +31,7 @@ public class TelegramUpdateMessage {
     protected TelegramUpdateDocument document;
     protected TelegramUpdateLeft_chat left_chat;
     protected TelegramUpdateLocation location;
+    protected TelegramUpdateDice dice;
 
     public TelegramUpdateMessage(JSONObject message, String token) throws JSONException {
         this.message_id = message.getInt("message_id");
@@ -93,6 +94,11 @@ public class TelegramUpdateMessage {
             this.location = new TelegramUpdateLocation(message);
         }catch (JSONException try8){
             this.location = null;
+        }
+        try{
+            this.dice = new TelegramUpdateDice(message);
+        }catch (JSONException try8){
+            this.dice = null;
         }
     }
 

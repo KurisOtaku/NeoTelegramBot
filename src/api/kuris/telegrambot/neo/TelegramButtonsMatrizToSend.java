@@ -13,6 +13,7 @@ import org.json.*;
  */
 public class TelegramButtonsMatrizToSend {
 
+
     public static JSONObject montaMatrizTecladoVoador_url(String[] texts,
             String[] urls) throws JSONException {
         JSONObject finalJson = new JSONObject();
@@ -25,15 +26,35 @@ public class TelegramButtonsMatrizToSend {
             obj = new JSONObject();
             obj.put("text", texts[i]);
             obj.put("url", urls[i]);
-            array.put(obj);
-            inlineKeyboardButton.put(array);
+            //array.put(obj);
+            inlineKeyboardButton.put(obj);
         }
         inlineKeyboardButtons.put(inlineKeyboardButton);
         finalJson.put("inline_keyboard", inlineKeyboardButtons);
         return finalJson;
     }
 
-  static JSONObject montaMatrizTecladoVoador_callback_equilibrado(String[] texts, String[] callbacks) {
+    public static JSONObject montaMatrizTecladoVoador_switch_inline_current_chat(String[] texts,
+            String[] query) throws JSONException {
+        JSONObject finalJson = new JSONObject();
+        JSONObject obj;
+        JSONArray inlineKeyboardButtons = new JSONArray();
+        JSONArray inlineKeyboardButton = new JSONArray();
+        JSONArray array = null;
+        for (int i = 0; i < texts.length; i++) {
+            array = new JSONArray();
+            obj = new JSONObject();
+            obj.put("text", texts[i]);
+            obj.put("switch_inline_query_current_chat", query[i]);
+            //array.put(obj);
+            inlineKeyboardButton.put(obj);
+        }
+        inlineKeyboardButtons.put(inlineKeyboardButton);
+        finalJson.put("inline_keyboard", inlineKeyboardButtons);
+        return finalJson;
+    }
+
+    static JSONObject montaMatrizTecladoVoador_callback_equilibrado(String[] texts, String[] callbacks) {
         JSONObject finalJson = new JSONObject();
         JSONObject obj;
         int numeroColunas = (int) Math.floor(Math.sqrt(texts.length));

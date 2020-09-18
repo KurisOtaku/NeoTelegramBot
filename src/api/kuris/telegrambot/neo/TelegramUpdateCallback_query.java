@@ -35,6 +35,8 @@ public class TelegramUpdateCallback_query {
         this.from = from;
     }
 
+
+
     public TelegramUpdateMessage MessageOfBot() {
         return messageOfBot;
     }

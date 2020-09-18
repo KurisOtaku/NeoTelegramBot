@@ -84,7 +84,7 @@ public class TelegramUpdate {
 
     public long chatID() {
         if (callback_query != null) {
-            return callback_query.from().id_user;
+            return callback_query.messageOfBot.chat.id_chat;
         } else {
             return message.chat.id_chat;
         }
@@ -103,7 +103,13 @@ public class TelegramUpdate {
     }
 
     public int messageId() {
-        return message.message_id;
+        if (message != null) {
+            return message.message_id;
+        } else if (callback_query != null) {
+            return callback_query.messageOfBot.message_id;
+        } else {
+            return 0;
+        }
     }
 
     public String entiteType() {
@@ -169,5 +175,17 @@ public class TelegramUpdate {
             this.exist_messages = false;
         }
 
+    }
+
+    public boolean haveDice() {
+        if (this.message.dice != null) {
+            return this.message.dice.isExist();
+        } else {
+            return false;
+        }
+    }
+
+    public TelegramUpdateDice dice() {
+        return this.message.dice;
     }
 }

@@ -15,6 +15,9 @@ import java.io.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
 import org.json.*;
 
 /**
@@ -24,6 +27,28 @@ import org.json.*;
 public class ApiNeoBot {
 
     final static LoggerApiNeoBot logger = new LoggerApiNeoBot();
+
+    public static void send_Location(String token, long id, Float valueOf, Float valueOf0) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private static void validationTitlesAnswerInline(String[] titles, String[] text) throws Exception {
+        if (titles.length != text.length) {
+            throw new Exception("titles.length != text.length");
+        } else if (titles.length > 50) {
+            throw new Exception("titles.length > 50");
+        } else if (titles.length < 1) {
+            throw new Exception("titles.length < 0");
+        } else {
+            Stream.of(titles, text)
+                    .flatMap(Stream::of)
+                    .filter(""::equals)
+                    .findFirst()
+                    .ifPresent(s -> {
+                        throw new RuntimeException("has item empty");
+                    });
+        }
+    }
 
     private String token;
     private long id_master;
@@ -37,6 +62,14 @@ public class ApiNeoBot {
     }
     private long id_chat_main;
 
+    /**
+     *
+     * @param token Fornecido pela Telegram
+     * @param id_master Seu ID no telegram (deve ser possitivo)
+     * @param id_chat_main ID do chat principal (caso exista) (deve ser
+     * negativo)
+     * @throws Throwable
+     */
     public ApiNeoBot(String token, long id_master, long id_chat_main) throws Throwable {
         try {
             if (id_master <= 0) {
@@ -55,9 +88,9 @@ public class ApiNeoBot {
             this.id_master = id_master;
             this.id_chat_main = id_chat_main;
 
-            TelegramResponseSend send = send(id_master, "Bot ONLINE");
+            TelegramResponseSend send = send(id_master, "Bot Pronto");
             if (send.ok) {
-                System.out.println("BOT ONLINE");
+                System.out.println("BOT Pronto");
             } else {
                 System.out.println("BOT OFFLINE");
                 throw new Throwable("Ocorreu um erro. Verifique os seguintes itens:\n"
@@ -72,9 +105,34 @@ public class ApiNeoBot {
                     + "- Conexão com internet;\n"
                     + "- Token;\n"
                     + "- ID mestre (usado na avaliação);\n"
-                    + "- Chat com o bot deve estar no mínimo iniciado para que o mesmo possa enviar uma mensagem;\n"
+                    + "- Chat com "
+                    + "o bot deve estar no mínimo iniciado para que o mesmo possa enviar uma mensagem;\n"
                     + "- Acredita em Deus(es)?");
         }
+    }
+
+    /**
+     *
+     * @return Telegram GET ME (informações do bot)
+     */
+    public TelegramResponseGetMe getMe() {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseGetMe telegram = null;
+        if (validationToken(token)) {
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "getMe");
+            connection.setAutoDownloadCertificates(true);
+            try {
+                telegram = new TelegramResponseGetMe(TelegramBotConnection.postTelegramMessage(connection));
+                return telegram;
+            } catch (JSONException error) {
+                logger.errorToSend(error);
+                return telegram;
+            }
+        } else {
+            logger.errorToken(token);
+            return telegram = null;
+        }
+
     }
 
     /**
@@ -95,6 +153,7 @@ public class ApiNeoBot {
                 return t_update;
             } catch (Exception trynot) {
                 logger.error("Erro ao buscar mensagens:" + trynot);
+                t_update = new TelegramUpdate(token, token);
                 t_update.text("I don't have messages");
                 return t_update;
             }
@@ -103,6 +162,68 @@ public class ApiNeoBot {
             t_update = null;
             return t_update;
         }
+    }
+
+    /**
+     * Busca o primeiro UPDATE da API da Telegram sem Offset
+     *
+     * @return TelegramUpdate (objeto de Mensagem)
+     * @throws JSONException
+     *
+     * @throws JSONException
+     */
+    public TelegramUpdate getInstanceNoOffset() throws JSONException {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramUpdate t_update = null;
+        if (validationToken(token)) {
+            try {
+                String conteudojson = TelegramBotConnection.getTelegramjson(token);
+                t_update = new TelegramUpdate(conteudojson, token);
+                t_update.Token(token);
+                return t_update;
+            } catch (Exception trynot) {
+                logger.error("Erro ao buscar mensagens:" + trynot);
+                t_update.text("I don't have messages");
+                return t_update;
+            }
+        } else {
+            logger.errorToken(token);
+            t_update = null;
+            return t_update;
+        }
+    }
+
+    /**
+     * Envia mensagem de texto normal com opção de notificação
+     *
+     * @param chat_id_to_send
+     * @param text_to_send
+     * @param notification
+     * @return TelegramResponseSend(Object)
+     * @throws JSONException
+     *
+     * @throws JSONException
+     */
+    public TelegramResponseSend send(long chat_id_to_send, String text_to_send) throws JSONException {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseSend telegram = null;
+        if (validationToken(token)) {
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
+            connection.putParameter("chat_id", chat_id_to_send + "");
+            connection.putParameter("text", text_to_send);
+            try {
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                return telegram;
+            } catch (JSONException error) {
+                logger.errorToSend(error);
+                return telegram;
+            }
+        } else {
+            logger.errorToken(token);
+            return telegram = null;
+        }
+
     }
 
     /**
@@ -122,12 +243,12 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             connection.putParameter("disable_notification", notification + "");
             try {
                 telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
-                System.out.println("");
                 return telegram;
             } catch (JSONException error) {
                 logger.errorToSend(error);
@@ -141,26 +262,56 @@ public class ApiNeoBot {
     }
 
     /**
-     * Envia mensagem de texto normal
+     * Envia um dado normal ou dardo.
      *
      * @param chat_id_to_send
-     * @param text_to_send
-     * @param notification
+     * @param dice_emoji
      * @return TelegramResponseSend(Object)
      * @throws JSONException
      *
      * @throws JSONException
      */
-    public TelegramResponseSend send(long chat_id_to_send, String text_to_send) throws JSONException {
+    public TelegramResponseSend sendDice(long chat_id_to_send, DiceEmoji dice_emoji) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
-            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendDice");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
-            connection.putParameter("text", text_to_send);
+            connection.putParameter("emoji", dice_emoji.toString() + "");
             try {
                 telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
-                System.out.println("");
+                return telegram;
+            } catch (JSONException error) {
+                logger.errorToSend(error);
+                return telegram;
+            }
+        } else {
+            logger.errorToken(token);
+            return telegram = null;
+        }
+    }
+
+    /**
+     * Envia um dado normal ou dardo.
+     *
+     * @param chat_id_to_send
+     * @param String dice_emoji
+     * @return TelegramResponseSend(Object)
+     * @throws JSONException
+     *
+     * @throws JSONException
+     */
+    public TelegramResponseSend sendDice(long chat_id_to_send, String dice_emoji) throws JSONException {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseSend telegram = null;
+        if (validationToken(token)) {
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendDice");
+            connection.setAutoDownloadCertificates(true);
+            connection.putParameter("chat_id", chat_id_to_send + "");
+            connection.putParameter("emoji", dice_emoji);
+            try {
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
                 return telegram;
             } catch (JSONException error) {
                 logger.errorToSend(error);
@@ -189,6 +340,7 @@ public class ApiNeoBot {
         JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTeclado(buttons);
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             connection.putParameter("reply_markup", matriz.toString());
@@ -218,6 +370,37 @@ public class ApiNeoBot {
             JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_url(button_texts, urls);
             if (validationToken(token)) {
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.setAutoDownloadCertificates(true);
+                connection.putParameter("chat_id", chat_id_to_send + "");
+                connection.putParameter("text", text_to_send);
+                connection.putParameter("reply_markup", matriz.toString());
+                try {
+                    telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                    return telegram;
+                } catch (JSONException error) {
+                    logger.errorToSend(error);
+                    return telegram;
+                }
+            } else {
+                logger.errorToken(token);
+                return telegram = null;
+            }
+        }
+    }
+
+    public TelegramResponseSend sendButtonFly_switch_inline_current_chat(long chat_id_to_send, String text_to_send,
+            String[] button_texts, String[] urls) throws JSONException {
+        if (button_texts.length != urls.length) {
+            logger.errorButtonFlyLayout("qt button texts <> qt urls");
+            return null;
+        } else {
+            ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+            TelegramResponseSend telegram = null;
+//        JSONObject layoutedButtons = getButtons(buttons);
+            JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_switch_inline_current_chat(button_texts, urls);
+            if (validationToken(token)) {
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.setAutoDownloadCertificates(true);
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.putParameter("text", text_to_send);
                 connection.putParameter("reply_markup", matriz.toString());
@@ -248,6 +431,7 @@ public class ApiNeoBot {
             JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_equilibrado(button_texts, callbacks);
             if (validationToken(token)) {
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.setAutoDownloadCertificates(true);
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.putParameter("text", text_to_send);
                 connection.putParameter("switch_pm_text", switch_pm_text);
@@ -280,6 +464,7 @@ public class ApiNeoBot {
             JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_equilibrado(button_texts, callbacks);
             if (validationToken(token)) {
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.setAutoDownloadCertificates(true);
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.putParameter("text", text_to_send);
                 connection.putParameter("reply_markup", matriz.toString());
@@ -310,6 +495,7 @@ public class ApiNeoBot {
             JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_multilines(button_texts, callbacks);
             if (validationToken(token)) {
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.setAutoDownloadCertificates(true);
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.putParameter("text", text_to_send);
                 connection.putParameter("reply_markup", matriz.toString());
@@ -333,6 +519,7 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "editMessageText");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("message_id", message_id + "");
             connection.putParameter("text", newText + "");
@@ -354,6 +541,7 @@ public class ApiNeoBot {
         TelegramResponseDelete telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "deleteMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_delete + "");
             connection.putParameter("message_id", message_id + "");
             try {
@@ -375,6 +563,7 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             connection.putParameter("parse_mode", parse_mode);
@@ -397,6 +586,7 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "answerInlineQuery");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("inline_query_id", inline_query_id + "");
             connection.putParameter("switch_pm_text", switch_pm_text);
             JSONArray results
@@ -422,6 +612,7 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "answerInlineQuery");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("inline_query_id", inline_query_id + "");
             JSONArray results
                     = TelegramInlineQueryResultArticle
@@ -449,6 +640,7 @@ public class ApiNeoBot {
         JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTeclado(buttons);
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             connection.putParameter("switch_inline_query", switch_inline_query);
@@ -466,16 +658,70 @@ public class ApiNeoBot {
         }
     }
 
+    public TelegramResponseSend sendReply(long chat_id_to_send, String text_to_send, int message_id) throws JSONException {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseSend telegram = null;
+        if (validationToken(this.token)) {
+            ZHttpPost connection = TelegramBotConnection.connectApi(this.token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
+            connection.putParameter("chat_id", chat_id_to_send + "");
+            connection.putParameter("text", text_to_send + "");
+            connection.putParameter("reply_to_message_id", message_id + "");
+            try {
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                return telegram;
+            } catch (JSONException error) {
+                logger.errorToReply(error, connection.parameterMap());
+                return telegram;
+            }
+        } else {
+            logger.errorToken(token);
+            return telegram = null;
+        }
+
+    }
+
     /*//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//
         A PARTIR DAQUI É STATIC TODOS OS METODOS ABAIXO SERÃO REFEITOS 
         PARA OS NON-STATIC
      *///=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//
+    public static TelegramResponseSend sendButtonFly_switch_inline_current_chat(String token, long chat_id_to_send, String text_to_send,
+            String[] button_texts, String[] urls) throws JSONException {
+        if (button_texts.length != urls.length) {
+            logger.errorButtonFlyLayout("qt button texts <> qt urls");
+            return null;
+        } else {
+            ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+            TelegramResponseSend telegram = null;
+//        JSONObject layoutedButtons = getButtons(buttons);
+            JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_switch_inline_current_chat(button_texts, urls);
+            if (validationToken(token)) {
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.setAutoDownloadCertificates(true);
+                connection.putParameter("chat_id", chat_id_to_send + "");
+                connection.putParameter("text", text_to_send);
+                connection.putParameter("reply_markup", matriz.toString());
+                try {
+                    telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                    return telegram;
+                } catch (JSONException error) {
+                    logger.errorToSend(error);
+                    return telegram;
+                }
+            } else {
+                logger.errorToken(token);
+                return telegram = null;
+            }
+        }
+    }
+
     public static TelegramResponseSend editMessage(String token,
             long chat_id_to_send, int message_id, String newText) {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "editMessageText");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("message_id", message_id + "");
             connection.putParameter("text", newText + "");
@@ -511,6 +757,7 @@ public class ApiNeoBot {
         TelegramResponseSticker telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendSticker");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id + "");
             connection.putParameter("reply_to_message_id", message_id_to_reply + "");
             connection.putParameter("sticker", sticker);
@@ -534,6 +781,7 @@ public class ApiNeoBot {
         TelegramResponseSticker telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendSticker");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id + "");
             connection.putParameter("sticker", sticker);
             try {
@@ -574,6 +822,7 @@ public class ApiNeoBot {
         TelegramResponseDelete telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "deleteMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_delete + "");
             connection.putParameter("message_id", message_id + "");
             try {
@@ -595,6 +844,7 @@ public class ApiNeoBot {
         TelegramResponseGetFile telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "getFile");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("file_id", file_id + "");
             try {
                 telegram = new TelegramResponseGetFile(TelegramBotConnection.postTelegramMessage(connection));
@@ -670,6 +920,7 @@ public class ApiNeoBot {
         JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTeclado(buttons);
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             connection.putParameter("reply_markup", matriz.toString());
@@ -699,6 +950,7 @@ public class ApiNeoBot {
             JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_url(button_texts, urls);
             if (validationToken(token)) {
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.setAutoDownloadCertificates(true);
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.putParameter("text", text_to_send);
                 connection.putParameter("reply_markup", matriz.toString());
@@ -729,9 +981,40 @@ public class ApiNeoBot {
             JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_equilibrado(button_texts, callbacks);
             if (validationToken(token)) {
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.setAutoDownloadCertificates(true);
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.putParameter("text", text_to_send);
                 connection.putParameter("reply_markup", matriz.toString());
+                try {
+                    telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                    return telegram;
+                } catch (JSONException error) {
+                    logger.errorToSend(error);
+                    return telegram;
+                }
+            } else {
+                logger.errorToken(token);
+                return telegram = null;
+            }
+        }
+    }
+
+    public static TelegramResponseSend sendButtonFly_callback(String token, long chat_id_to_send, String text_to_send,
+            String[] button_texts, String[] callbacks, boolean notification) throws JSONException {
+        if (button_texts.length != callbacks.length) {
+            logger.errorButtonFlyLayout("qt button texts <> qt urls");
+            return null;
+        } else {
+            ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+            TelegramResponseSend telegram = null;
+            JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_equilibrado(button_texts, callbacks);
+            if (validationToken(token)) {
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.setAutoDownloadCertificates(true);
+                connection.putParameter("chat_id", chat_id_to_send + "");
+                connection.putParameter("text", text_to_send);
+                connection.putParameter("reply_markup", matriz.toString());
+                connection.putParameter("disable_notification", !notification + "");
                 try {
                     telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
                     return telegram;
@@ -753,6 +1036,7 @@ public class ApiNeoBot {
         objeto.put("hide_keyboard", true);
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             connection.putParameter("reply_markup", objeto.toString());
@@ -775,6 +1059,7 @@ public class ApiNeoBot {
         objeto.put("hide_keyboard", true);
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", "-");
             connection.putParameter("reply_markup", objeto.toString());
@@ -887,6 +1172,7 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send + "");
             connection.putParameter("reply_to_message_id", message_id + "");
@@ -909,6 +1195,7 @@ public class ApiNeoBot {
         TelegramResponseSendGif telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendAnimation");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("reply_to_message_id", message_id_to_reply + "");
             connection.putParameter("animation", gif_id);
@@ -931,6 +1218,7 @@ public class ApiNeoBot {
         TelegramResponseSendGif telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendAnimation");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("animation", gif_id);
             try {
@@ -953,6 +1241,7 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "answerCallbackQuery");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("callback_query_id", callback_query_id + "");
             connection.putParameter("text", text);
             connection.putParameter("show_alert", show_alert + "");
@@ -970,26 +1259,35 @@ public class ApiNeoBot {
     }
 
     public static TelegramResponseSend sendAnswerInlineQuery(String token, String inline_query_id,
-            String titles[], String text[]) {
-        boolean retorno = false;
+            String titles[], String text[]) throws Exception {
         TelegramResponseSend telegram = null;
-        if (validationToken(token)) {
-            ZHttpPost connection = TelegramBotConnection.connectApi(token, "answerInlineQuery");
-            connection.putParameter("inline_query_id", inline_query_id + "");
-            JSONArray results
-                    = TelegramInlineQueryResultArticle
-                            .montaInlineQueryResultArticle("article", titles, text);
-            connection.putParameter("results", results.toString());
-            try {
-                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
-                return telegram;
-            } catch (JSONException error) {
-                logger.errorToSend(error);
-                return telegram;
+        try {
+            if (validationToken(token)) {
+                validationTitlesAnswerInline(titles, text);
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "answerInlineQuery");
+                connection.setAutoDownloadCertificates(true);
+                connection.putParameter("inline_query_id", inline_query_id + "");
+                JSONArray results
+                        = TelegramInlineQueryResultArticle
+                                .montaInlineQueryResultArticle("article", titles, text);
+                connection.putParameter("results", results.toString());
+                try {
+                    String json = TelegramBotConnection.postTelegramMessage(connection);
+                    telegram = new TelegramResponseSend(json, token);
+                    return telegram;
+                } catch (JSONException error) {
+                    logger.errorToSend(error);
+                    return telegram;
+                } catch (Exception error) {
+                    logger.errorToSend(error);
+                    return telegram;
+                }
+            } else {
+                logger.errorToken(token);
+                return telegram = null;
             }
-        } else {
-            logger.errorToken(token);
-            return telegram = null;
+        } catch (Exception d) {
+            throw new Exception("Validação de campos", d);
         }
     }
 
@@ -1000,6 +1298,7 @@ public class ApiNeoBot {
         try {
             if (validationToken(token)) {
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "answerInlineQuery");
+                connection.setAutoDownloadCertificates(true);
                 connection.putParameter("inline_query_id", inline_query_id + "");
                 JSONArray results
                         = TelegramInlineQueryResultArticle
@@ -1026,6 +1325,7 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendDocument");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("document", gif_id);
             connection.putParameter("caption", caption);
@@ -1048,6 +1348,7 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendDocument");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("document", gif_id);
             connection.putParameter("caption", caption);
@@ -1075,6 +1376,7 @@ public class ApiNeoBot {
         if (validationToken(token)) {
             try {
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendPhoto");
+                connection.setAutoDownloadCertificates(true);
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.putParameter("caption", caption + "");
                 connection.sendFile("photo", file);
@@ -1096,6 +1398,7 @@ public class ApiNeoBot {
         if (validationToken(token)) {
             try {
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendPhoto");
+                connection.setAutoDownloadCertificates(true);
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.sendFile("photo", file);
                 resposta = true;
@@ -1117,6 +1420,7 @@ public class ApiNeoBot {
             try {
                 final File arq = new File(pathFile);
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendDocument");
+                connection.setAutoDownloadCertificates(true);
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.sendFile("document", arq);
                 resposta = true;
@@ -1138,6 +1442,7 @@ public class ApiNeoBot {
             try {
                 final File arq = new File(pathFile);
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendDocument");
+                connection.setAutoDownloadCertificates(true);
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.sendFile("document", name_file, (long) pathFile.getBytes().length, new ByteArrayInputStream(pathFile.getBytes()));
                 resposta = true;
@@ -1157,6 +1462,7 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             connection.putParameter("parse_mode", parse_mode);
@@ -1180,6 +1486,7 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             connection.putParameter("parse_mode", parse_mode);
@@ -1203,12 +1510,12 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             connection.putParameter("disable_notification", notification + "");
             try {
                 telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
-                System.out.println("");
                 return telegram;
             } catch (JSONException error) {
                 logger.errorToSend(error);
@@ -1226,11 +1533,12 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
             try {
                 telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
-                System.out.println("");
                 return telegram;
             } catch (JSONException error) {
                 logger.errorToSend(error);
@@ -1248,8 +1556,32 @@ public class ApiNeoBot {
         TelegramResponseSend telegram = null;
         if (validationToken(token)) {
             ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+            connection.setAutoDownloadCertificates(true);
+            connection.setAutoDownloadCertificates(true);
             connection.putParameter("chat_id", chat_id_to_send + "");
             connection.putParameter("text", text_to_send);
+            try {
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                return telegram;
+            } catch (JSONException error) {
+                logger.errorToSend(error);
+                return telegram;
+            }
+        } else {
+            logger.errorToken(token);
+            return telegram = null;
+        }
+    }
+
+    public static TelegramResponseSend sendLocation(String token, long chat_id_to_send, String latitude, String longitude) {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseSend telegram = null;
+        if (validationToken(token)) {
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendLocation");
+            connection.setAutoDownloadCertificates(true);
+            connection.putParameter("chat_id", chat_id_to_send + "");
+            connection.putParameter("latitude", String.valueOf(latitude));
+            connection.putParameter("longitude", String.valueOf(longitude));
             try {
                 telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
                 return telegram;

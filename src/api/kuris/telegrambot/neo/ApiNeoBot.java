@@ -1029,6 +1029,39 @@ public class ApiNeoBot {
         }
     }
 
+    public static TelegramResponseSend sendButtonFly_callbackMarkDown(
+            String token, long chat_id_to_send, String text_to_send,
+            String[] button_texts, String[] callbacks, String parse_mode,
+            boolean notification) throws JSONException {
+        if (button_texts.length != callbacks.length) {
+            logger.errorButtonFlyLayout("qt button texts <> qt urls");
+            return null;
+        } else {
+            ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+            TelegramResponseSend telegram = null;
+            JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_equilibrado(button_texts, callbacks);
+            if (validationToken(token)) {
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.setAutoDownloadCertificates(true);
+                connection.putParameter("chat_id", chat_id_to_send + "");
+                connection.putParameter("text", text_to_send);
+                connection.putParameter("parse_mode", parse_mode);
+                connection.putParameter("reply_markup", matriz.toString());
+                connection.putParameter("disable_notification", !notification + "");
+                try {
+                    telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                    return telegram;
+                } catch (JSONException error) {
+                    logger.errorToSend(error);
+                    return telegram;
+                }
+            } else {
+                logger.errorToken(token);
+                return telegram = null;
+            }
+        }
+    }
+
     public static TelegramResponseSend hideButtonWithMessage(String token, long chat_id_to_send, String text_to_send) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;

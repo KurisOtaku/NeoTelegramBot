@@ -681,6 +681,28 @@ public class ApiNeoBot {
 
     }
 
+    public boolean sendPhoto(long chat_id_to_send, File file, String caption) throws JSONException {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        boolean resposta = false;
+        if (validationToken(token)) {
+            try {
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendPhoto");
+                connection.setAutoDownloadCertificates(true);
+                connection.putParameter("chat_id", chat_id_to_send + "");
+                connection.putParameter("caption", caption + "");
+                connection.sendFile("photo", file);
+                resposta = true;
+            } catch (Exception error) {
+                logger.errorToSend(error);
+                resposta = false;
+            }
+        } else {
+            logger.errorToken(token);
+            resposta = false;
+        }
+        return resposta;
+    }
+
     /*//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//
         A PARTIR DAQUI É STATIC TODOS OS METODOS ABAIXO SERÃO REFEITOS 
         PARA OS NON-STATIC

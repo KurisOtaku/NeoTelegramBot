@@ -51,7 +51,13 @@
         bot.send(recebida.chatID(), "Hello World! 🌎"); // Envia mensagens
     }
 ```
-
+#### Primeiro erro?
+Tente mandar ao menos uma mensagem pro bot antes de executar a linha do `bot.send`.😉
+```log
+Exception in thread "main" java.lang.NullPointerException
+	at api.kuris.telegrambot.neo.TelegramUpdate.chatID(TelegramUpdate.java:89)
+	at Newaii.main(Newaii.java:28)
+```
 
 ## Colaborador
 <a href="https://github.com/LuizHenriqueKS/"> ZUL </a>

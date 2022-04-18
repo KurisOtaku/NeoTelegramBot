@@ -26,6 +26,7 @@ import org.json.*;
 public class ApiNeoBot {
 
     final static LoggerApiNeoBot logger = new LoggerApiNeoBot();
+    final public static int limitSizeText = 4096;
 
     public static void send_Location(String token, long id, Float valueOf, Float valueOf0) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -706,6 +707,31 @@ public class ApiNeoBot {
         A PARTIR DAQUI É STATIC TODOS OS METODOS ABAIXO SERÃO REFEITOS 
         PARA OS NON-STATIC
      *///=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//=//
+//@todo: implementar "Encaminhar mensagens"
+//https://core.telegram.org/bots/api#forwardmessage  
+    public static TelegramResponseSend forwardMessage(String token, long chat_id_origin, long chat_id_to_send, int message_id) throws JSONException {
+        ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
+        TelegramResponseSend telegram = null;
+        if (validationToken(token)) {
+            ZHttpPost connection = TelegramBotConnection.connectApi(token, "forwardMessage");
+            connection.setAutoDownloadCertificates(true);
+            connection.putParameter("chat_id", chat_id_to_send + "");
+            connection.putParameter("from_chat_id", chat_id_origin + "");
+            connection.putParameter("reply_to_message_id", message_id + "");
+            try {
+                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                return telegram;
+            } catch (JSONException error) {
+                logger.errorToReply(error, connection.parameterMap());
+                return telegram;
+            }
+        } else {
+            logger.errorToken(token);
+            return telegram = null;
+        }
+
+    }
+
     public static TelegramResponseSend sendButtonFly_switch_inline_current_chat(String token, long chat_id_to_send, String text_to_send,
             String[] button_texts, String[] urls) throws JSONException {
         if (button_texts.length != urls.length) {
@@ -828,6 +854,24 @@ public class ApiNeoBot {
         }
         if (x.Message().from.last_name != null) {
             resposta += "Sobrenome: " + x.Message().from.last_name + "\n";
+        }
+        if (x.Message().from.username != null) {
+            resposta += "Username: @" + x.Message().from.username + "\n";
+        }
+        if (x.Message().getChat().getId_chat() != x.Message().getFrom().getId_user()) {
+            resposta += "Chat: " + x.Message().getChat().getId_chat() + "\n";
+        }
+        return resposta;
+    }
+
+    public static String getUserInformationsHTML(TelegramUpdate x) {
+        String resposta = "";
+        resposta += "ID de Usuário: <code>" + x.Message().from.id_user + "</code>\n";
+        if (x.Message().from.first_name != null) {
+            resposta += "Nome: <code>" + x.Message().from.first_name + "</code>\n";
+        }
+        if (x.Message().from.last_name != null) {
+            resposta += "Sobrenome: <code>" + x.Message().from.last_name + "</code>\n";
         }
         if (x.Message().from.username != null) {
             resposta += "Username: @" + x.Message().from.username + "\n";
@@ -1585,21 +1629,26 @@ public class ApiNeoBot {
     public static TelegramResponseSend send(String token, long chat_id_to_send, String text_to_send) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         TelegramResponseSend telegram = null;
-        if (validationToken(token)) {
-            ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
-            connection.setAutoDownloadCertificates(true);
-            connection.setAutoDownloadCertificates(true);
-            connection.putParameter("chat_id", chat_id_to_send + "");
-            connection.putParameter("text", text_to_send);
-            try {
-                telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
-                return telegram;
-            } catch (JSONException error) {
-                logger.errorToSend(error);
-                return telegram;
+        if (text_to_send.length() < limitSizeText) {
+            if (validationToken(token)) {
+                ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
+                connection.setAutoDownloadCertificates(true);
+                connection.setAutoDownloadCertificates(true);
+                connection.putParameter("chat_id", chat_id_to_send + "");
+                connection.putParameter("text", text_to_send);
+                try {
+                    telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
+                    return telegram;
+                } catch (JSONException error) {
+                    logger.errorToSend(error);
+                    return telegram;
+                }
+            } else {
+                logger.errorToken(token);
+                return telegram = null;
             }
         } else {
-            logger.errorToken(token);
+            logger.errorToken("Utrapassa Limite de caracteres("+text_to_send.length()+"/"+limitSizeText+")");
             return telegram = null;
         }
 

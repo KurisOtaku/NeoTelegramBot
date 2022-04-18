@@ -49,6 +49,10 @@ public class LoggerApiNeoBot {
         logger.error("Erro de Token : " + parameter);
     }
 
+    void errorMessageSize(String parameter) {
+        logger.error("Erro de MessageSize : " + parameter);
+    }
+
     void errorToSend(JSONException error) {
         logger.error("Erro ao enviar : " + error);
     }

@@ -858,9 +858,9 @@ public class ApiNeoBot {
         if (x.Message().from.username != null) {
             resposta += "Username: @" + x.Message().from.username + "\n";
         }
-        if (x.Message().getChat().getId_chat() != x.Message().getFrom().getId_user()) {
+        //if (x.Message().getChat().getId_chat() != x.Message().getFrom().getId_user()) {
             resposta += "Chat: " + x.Message().getChat().getId_chat() + "\n";
-        }
+       // }
         return resposta;
     }
 
@@ -1511,24 +1511,26 @@ public class ApiNeoBot {
         return resposta;
     }
 
-    public static boolean sendFile(String token, long chat_id_to_send, String pathFile) throws JSONException {
+    public static TelegramResponseSend sendFile(String token, long chat_id_to_send, String pathFile) throws JSONException {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
-        boolean resposta = false;
+        //boolean resposta = false;
+        TelegramResponseSend resposta = new TelegramResponseSend(null, token);
         if (validationToken(token)) {
             try {
                 final File arq = new File(pathFile);
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendDocument");
                 connection.setAutoDownloadCertificates(true);
                 connection.putParameter("chat_id", chat_id_to_send + "");
-                connection.sendFile("document", arq);
-                resposta = true;
+                ZHttpResponse response = connection.sendFile("document", arq);
+                resposta = new TelegramResponseSend(response.getResponseText(), token);
+                return resposta;
             } catch (Exception error) {
                 logger.errorToSend(error);
-                resposta = false;
+                //resposta = false;
             }
         } else {
             logger.errorToken(token);
-            resposta = false;
+            //resposta = false;
         }
         return resposta;
     }
@@ -1648,7 +1650,7 @@ public class ApiNeoBot {
                 return telegram = null;
             }
         } else {
-            logger.errorToken("Utrapassa Limite de caracteres("+text_to_send.length()+"/"+limitSizeText+")");
+            logger.errorToken("Utrapassa Limite de caracteres(" + text_to_send.length() + "/" + limitSizeText + ")");
             return telegram = null;
         }
 

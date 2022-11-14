@@ -1,4 +1,5 @@
 /test/
+/dist/
 /Log/
 /commons-lang3-3.7/
 /data/
@@ -7,3 +8,4 @@
 /Trash/
 build.xml
 Key_NBT.ppk
+/dist/

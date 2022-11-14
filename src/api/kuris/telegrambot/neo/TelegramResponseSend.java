@@ -74,61 +74,68 @@ public class TelegramResponseSend {
     }
 
     public TelegramResponseSend(String json, String token) throws JSONException {
-        JSONObject jsonObj = new JSONObject(json);
-        boolean ok = jsonObj.getBoolean("ok");
-        if (ok) {
-            try {
-                JSONObject result;
-                boolean b_result;
+        if (json != null) {
+            JSONObject jsonObj = new JSONObject(json);
+            boolean ok = jsonObj.getBoolean("ok");
+            if (ok) {
                 try {
-                    result = jsonObj.getJSONObject("result");
-                    this.message_id = result.getInt("message_id");
-                    this.from = new TelegramUpdateFrom(result);
-                    this.chat = new TelegramUpdateChat(result);
-                    this.date = result.getInt("date");
+                    JSONObject result;
+                    boolean b_result;
+                    try {
+                        result = jsonObj.getJSONObject("result");
+                        this.message_id = result.getInt("message_id");
+                        this.from = new TelegramUpdateFrom(result);
+                        this.chat = new TelegramUpdateChat(result);
+                        this.date = result.getInt("date");
 
-                    try {
-                        this.text = result.getString("text");
-                    } catch (JSONException jSONException) {
-                        this.text = null;
-                    }
+                        try {
+                            this.text = result.getString("text");
+                        } catch (JSONException jSONException) {
+                            this.text = null;
+                        }
 
-                    try {
-                        this.reply_to_message = new TelegramUpdateReply_to_message(result, token);
-                    } catch (Exception replyError) {
-                        this.reply_to_message = null;
+                        try {
+                            this.reply_to_message = new TelegramUpdateReply_to_message(result, token);
+                        } catch (Exception replyError) {
+                            this.reply_to_message = null;
+                        }
+                        try {
+                            this.dice = new TelegramUpdateDice(result);
+                        } catch (Exception replyError) {
+                            this.dice = null;
+                        }
+                        this.error_code = 0;
+                        this.error_description = "#null";
+                        this.token = token;
+                    } catch (Exception ex) {
+                        b_result = jsonObj.getBoolean("result");
+                        this.ok = b_result;
                     }
-                    try {
-                        this.dice = new TelegramUpdateDice(result);
-                    } catch (Exception replyError) {
-                        this.dice = null;
-                    }
-                    this.error_code = 0;
-                    this.error_description = "#null";
+                    this.ok = true;
+                } catch (Exception pegaErro1) {
+                    this.ok = false;
+                    this.message_id = 0;
+                    this.from = null;
+                    this.chat = null;
+                    this.dice = null;
+                    this.date = 0;
+                    this.text = "#null";
+                    this.reply_to_message = null;
+                    this.error_code = new JSONObject(json).getInt("error_code");
+                    this.error_description = new JSONObject(json).getString("description");
                     this.token = token;
-                } catch (Exception ex) {
-                    b_result = jsonObj.getBoolean("result");
-                    this.ok = b_result;
                 }
-                this.ok = true;
-            } catch (Exception pegaErro1) {
+            } else {
                 this.ok = false;
-                this.message_id = 0;
-                this.from = null;
-                this.chat = null;
-                this.dice = null;
-                this.date = 0;
-                this.text = "#null";
-                this.reply_to_message = null;
-                this.error_code = new JSONObject(json).getInt("error_code");
-                this.error_description = new JSONObject(json).getString("description");
                 this.token = token;
+                this.error_code = jsonObj.getInt("error_code");
+                this.error_description = jsonObj.getString("description");
             }
         } else {
             this.ok = false;
             this.token = token;
-            this.error_code = jsonObj.getInt("error_code");
-            this.error_description = jsonObj.getString("description");
+            this.error_code = 0;
+            this.error_description = "not-json";
         }
     }
 

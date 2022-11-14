@@ -39,7 +39,7 @@
 
 #### Primeiros passos
 - Acesse o <a href="t.me/BotFather">BotFather</a> crie o bot e gere um token.
-- Seu ID pode ser encontrado com o bot <a href="t.me/userinfobot">@userinfobot</a> (great <a href="https://github.com/nadam">nadam</a>!)
+- Seu ID pode ser encontrado com o bot @<a href="t.me/userinfobot">userinfobot</a> (great <a href="https://github.com/nadam">nadam</a>!)
 
 ```java
    public static void main(String[] args) throws Throwable {

@@ -24,6 +24,11 @@ public class TelegramUpdate {
     protected boolean callback;
     protected boolean textMessage;
     protected boolean inline;
+    protected TypeMessage typemessage;
+
+    public TypeMessage getTypemessage() {
+        return typemessage;
+    }
 
     public boolean isInline() {
         return inline;
@@ -143,6 +148,7 @@ public class TelegramUpdate {
                 this.update_id = 0;
             }
             this.textMessage = false;
+            typemessage = TypeMessage.Text;
             this.callback = false;
             this.inline = false;
             try {
@@ -154,6 +160,7 @@ public class TelegramUpdate {
                     this.edited_message = new TelegramUpdateEdited_message(updates.getJSONObject("edited_message"), token);
                 }
                 this.textMessage = true;
+                typemessage = TypeMessage.Text;
             } catch (Exception tr6) {
                 this.message = null;
                 this.edited_message = null;
@@ -161,12 +168,14 @@ public class TelegramUpdate {
             try {
                 this.callback_query = new TelegramUpdateCallback_query(updates.getJSONObject("callback_query"), token);
                 this.callback = true;
+                typemessage = TypeMessage.ButtonFly;
             } catch (Exception tr9) {
                 this.callback_query = null;
             }
             try {
                 this.inline_query = new TelegramUpdateInline_query(updates);
                 this.inline = true;
+                typemessage = TypeMessage.InLine;
             } catch (Exception tr5) {
                 this.inline_query = null;
             }

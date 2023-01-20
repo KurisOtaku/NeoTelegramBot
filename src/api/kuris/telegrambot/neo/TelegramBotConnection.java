@@ -22,7 +22,7 @@ public class TelegramBotConnection {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         String conteudojson = "{\"ok\":false,\"error_code\":000,\"description\":\"You don't have a telegrambot token\"}";
         try {
-           // System.out.println(url + token + "/" + command_api);
+            // System.out.println(url + token + "/" + command_api);
             conteudojson = new ZHttp()
                     .requestGet(url + token + "/" + command_api)
                     .send()
@@ -41,7 +41,7 @@ public class TelegramBotConnection {
         ZLogFileWriter.setDefaultLogFileWriter(new ZLogFileWriter("Log"));
         String resposta = "";
         try {
-            System.out.println(request.getUrl()+"\n"+request.getParameter("text"));
+            System.out.println(request.getUrl() + "\n" + request.getParameter("text"));
             resposta = request.send().getResponseText();
         } catch (Exception errorconnect) {
             resposta = "{\"ok\":false,\"error_code\":000,\"description\":\"By ApiNeoBot: Error don't find.\"}";

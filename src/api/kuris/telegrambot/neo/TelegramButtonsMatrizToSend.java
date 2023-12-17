@@ -53,7 +53,23 @@ public class TelegramButtonsMatrizToSend {
         finalJson.put("inline_keyboard", inlineKeyboardButtons);
         return finalJson;
     }
-
+ static JSONObject montaListTecladoVoador_callback_equilibrado(String[] texts, String[] callbacks) {
+        JSONObject finalJson = new JSONObject();
+        JSONObject obj;
+        JSONArray inlineKeyboardButtons = new JSONArray();
+        JSONArray inlineKeyboardButton = new JSONArray();
+        for (int i = 0; i < texts.length; i++) {
+                inlineKeyboardButton = new JSONArray();
+                inlineKeyboardButtons.put(inlineKeyboardButton);
+            obj = new JSONObject();
+            obj.put("text", texts[i]);
+            obj.put("callback_data", callbacks[i]);
+            inlineKeyboardButton.put(obj);
+        }
+        finalJson.put("inline_keyboard", inlineKeyboardButtons);
+        return finalJson;
+    }
+ 
     static JSONObject montaMatrizTecladoVoador_callback_equilibrado(String[] texts, String[] callbacks) {
         JSONObject finalJson = new JSONObject();
         JSONObject obj;

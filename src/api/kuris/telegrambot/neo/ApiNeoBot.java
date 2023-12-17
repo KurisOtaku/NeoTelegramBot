@@ -833,8 +833,6 @@ public class ApiNeoBot {
         }
     }
 
-
-
     public static TelegramResponseSend editMessageButtonFly_callback(String token,
             long chat_id_to_send, int message_id,
             String[] button_texts, String[] callbacks) {
@@ -1120,7 +1118,7 @@ public class ApiNeoBot {
     }
 
     public static TelegramResponseSend sendButtonFly_callback(String token, long chat_id_to_send, String text_to_send,
-            String[] button_texts, String[] callbacks) throws JSONException {
+            String[] button_texts, String[] callbacks, boolean notification, boolean asList) throws JSONException {
         if (button_texts.length != callbacks.length) {
             logger.errorButtonFlyLayout("qt button texts <> qt urls");
             return null;
@@ -1129,13 +1127,19 @@ public class ApiNeoBot {
             TelegramResponseSend telegram = null;
 //        JSONObject layoutedButtons = getButtons(buttons);
             // JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_multilines(button_texts, callbacks);
-            JSONObject matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_equilibrado(button_texts, callbacks);
+            JSONObject matriz = null;
+            if (asList) {
+                matriz = TelegramButtonsMatrizToSend.montaListTecladoVoador_callback_equilibrado(button_texts, callbacks);
+            } else {
+                matriz = TelegramButtonsMatrizToSend.montaMatrizTecladoVoador_callback_equilibrado(button_texts, callbacks);
+            }
             if (validationToken(token)) {
                 ZHttpPost connection = TelegramBotConnection.connectApi(token, "sendMessage");
                 connection.setAutoDownloadCertificates(true);
                 connection.putParameter("chat_id", chat_id_to_send + "");
                 connection.putParameter("text", text_to_send);
                 connection.putParameter("reply_markup", matriz.toString());
+                connection.putParameter("disable_notification", !notification + "");
                 try {
                     telegram = new TelegramResponseSend(TelegramBotConnection.postTelegramMessage(connection), token);
                     return telegram;
